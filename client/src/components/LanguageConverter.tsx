@@ -14,7 +14,6 @@ import { SUPPORTED_LANGUAGES, validateNameInput } from "@/lib/transliterationMap
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
   sourceLanguage: z.string().min(2, "Please select a language"),
-  chinesePronunciationType: z.enum(["original", "korean"]).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -26,14 +25,12 @@ interface LanguageConverterProps {
 
 export function LanguageConverter({ onConvert, isLoading }: LanguageConverterProps) {
   const [inputValue, setInputValue] = useState("");
-  const [chinesePronunciationType, setChinesePronunciationType] = useState<"original" | "korean">("original");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       sourceLanguage: "en",
-      chinesePronunciationType: "original",
     },
   });
 
@@ -98,55 +95,7 @@ export function LanguageConverter({ onConvert, isLoading }: LanguageConverterPro
                 />
               </div>
 
-              {/* Chinese Pronunciation Type Selection - Only show for Chinese languages */}
-              {(form.watch("sourceLanguage") === "zh" || form.watch("sourceLanguage") === "zh-cn" || form.watch("sourceLanguage") === "zh-tw") && (
-                <div className="md:col-span-3">
-                  <FormField
-                    control={form.control}
-                    name="chinesePronunciationType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-700 mb-3 block">
-                          Chinese Pronunciation Style
-                        </FormLabel>
-                        <FormControl>
-                          <div className="flex gap-3">
-                            <Button
-                              type="button"
-                              variant={field.value === "original" ? "default" : "outline"}
-                              onClick={() => {
-                                field.onChange("original");
-                                setChinesePronunciationType("original");
-                              }}
-                              className="flex-1 py-3 px-4 text-sm"
-                            >
-                              Original Chinese Pronunciation
-                              <span className="block text-xs opacity-70 mt-1">
-                                Based on Mandarin/Cantonese sounds
-                              </span>
-                            </Button>
-                            <Button
-                              type="button"
-                              variant={field.value === "korean" ? "default" : "outline"}
-                              onClick={() => {
-                                field.onChange("korean");
-                                setChinesePronunciationType("korean");
-                              }}
-                              className="flex-1 py-3 px-4 text-sm"
-                            >
-                              Korean-style Chinese Reading
-                              <span className="block text-xs opacity-70 mt-1">
-                                Traditional Korean pronunciation (한자음)
-                              </span>
-                            </Button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              )}
+
 
               {/* Name Input */}
               <div className="md:col-span-2">

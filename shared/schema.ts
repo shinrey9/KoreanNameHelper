@@ -31,7 +31,6 @@ export const insertConversionSchema = createInsertSchema(conversions).omit({
 export const conversionRequestSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long"),
   sourceLanguage: z.string().min(2, "Invalid language code"),
-  chinesePronunciationType: z.enum(["original", "korean"]).optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
