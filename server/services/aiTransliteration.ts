@@ -95,11 +95,15 @@ Provide your response in JSON format with these exact fields:
 
 Examples for context:
 - "John" → "존" (jon)
-- "Smith" → "스미스" (seumiseu) 
-- "María" → "마리아" (maria)
-- "François" → "프랑수아" (peurangsua)
+- "Smith" → "스미스" (seu-mi-seu) 
+- "María" → "마리아" (ma-ri-a)
+- "François" → "프랑수아" (peu-rang-su-a)
 
-Make sure each syllable in the breakdown corresponds to meaningful parts of the original name.`;
+Make sure each syllable in the breakdown corresponds to meaningful parts of the original name.
+
+IMPORTANT: For the romanization field, separate each Korean syllable with spaces or hyphens for clear pronunciation. For example:
+- 존스미스 should be romanized as "jon-seu-mi-seu" or "jon seu mi seu"
+- 마리아 should be romanized as "ma-ri-a" or "ma ri a"`;
   }
 
   async detectLanguage(text: string): Promise<string> {
