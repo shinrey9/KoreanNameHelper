@@ -11,7 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Convert name to Korean using AI
   app.post("/api/convert", async (req, res) => {
     try {
-      const { name, sourceLanguage } = conversionRequestSchema.parse(req.body);
+      const { name, sourceLanguage, chinesePronunciationType } = conversionRequestSchema.parse(req.body);
       
       // Auto-detect language if requested
       const detectedLanguage = sourceLanguage === 'auto' 
@@ -19,7 +19,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : sourceLanguage;
       
       // Convert to Korean using AI
-      const result = await aiTransliterationService.convertToKorean(name, detectedLanguage);
+      const result = await aiTransliterationService.convertToKorean(name, detectedLanguage, chinesePronunciationType);
       
       // Store conversion
       const conversion = await storage.createConversion({

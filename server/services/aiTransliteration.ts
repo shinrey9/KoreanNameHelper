@@ -17,9 +17,9 @@ interface AITransliterationResult {
 
 class AITransliterationService {
   
-  async convertToKorean(name: string, sourceLanguage: string): Promise<AITransliterationResult> {
+  async convertToKorean(name: string, sourceLanguage: string, chinesePronunciationType?: 'original' | 'korean'): Promise<AITransliterationResult> {
     try {
-      const prompt = this.buildPrompt(name, sourceLanguage);
+      const prompt = this.buildPrompt(name, sourceLanguage, chinesePronunciationType);
       
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
@@ -51,7 +51,7 @@ class AITransliterationService {
     }
   }
 
-  private buildPrompt(name: string, sourceLanguage: string): string {
+  private buildPrompt(name: string, sourceLanguage: string, chinesePronunciationType?: 'original' | 'korean'): string {
     const languageNames: Record<string, string> = {
       'en': 'English',
       'es': 'Spanish', 
@@ -71,14 +71,33 @@ class AITransliterationService {
 
     const sourceLangName = languageNames[sourceLanguage] || sourceLanguage;
 
-    return `Convert the ${sourceLangName} name "${name}" to Korean Hangul with accurate pronunciation.
+    let basePrompt = `Convert the ${sourceLangName} name "${name}" to Korean Hangul with accurate pronunciation.
 
 Instructions:
 1. Consider the phonetics and pronunciation of the original name in ${sourceLangName}
 2. Use proper Korean syllable structure (consonant-vowel-consonant pattern)
 3. Follow Korean transliteration conventions for foreign names
 4. For family names, use common Korean surname equivalents when appropriate
-5. Ensure the Korean version sounds natural when pronounced by Korean speakers
+5. Ensure the Korean version sounds natural when pronounced by Korean speakers`;
+
+    // Add special instructions for Chinese characters
+    if (sourceLanguage === 'zh' || sourceLanguage === 'zh-cn' || sourceLanguage === 'zh-tw') {
+      if (chinesePronunciationType === 'korean') {
+        basePrompt += `
+
+SPECIAL INSTRUCTION FOR CHINESE CHARACTERS: This is a Chinese character name. Use Korean-style Chinese character pronunciation (한자음/音讀). Convert each Chinese character to its Korean reading, not the original Chinese pronunciation. For example:
+- 李 → 리 (not lǐ)
+- 王 → 왕 (not wáng)  
+- 美 → 미 (not měi)
+- 金 → 김 (not jīn)`;
+      } else {
+        basePrompt += `
+
+SPECIAL INSTRUCTION FOR CHINESE CHARACTERS: This is a Chinese character name. Use the original Chinese pronunciation to create the Korean transliteration. Base the Korean conversion on how the Chinese name actually sounds in Chinese (Mandarin/Cantonese), not the Korean reading of the characters.`;
+      }
+    }
+
+    return basePrompt + `
 
 Provide your response in JSON format with these exact fields:
 {
