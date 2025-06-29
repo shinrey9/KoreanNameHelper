@@ -106,10 +106,14 @@ export default function Home() {
         {/* Intro Section */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Discover Your Korean Name</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-4">
             Enter your name and instantly see how it's written and pronounced in Korean. 
             Perfect for learning Korean, creating Korean social media profiles, or just for fun!
           </p>
+          <div className="inline-flex items-center bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+            <span className="text-sm text-blue-700 font-medium">Powered by AI for accurate pronunciation</span>
+          </div>
         </div>
 
         {/* Converter Section */}
@@ -148,11 +152,11 @@ export default function Home() {
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">2</div>
-                  <p className="text-gray-600">Our algorithm converts phonetics to Korean Hangul</p>
+                  <p className="text-gray-600">AI analyzes pronunciation and converts to accurate Korean Hangul</p>
                 </div>
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">3</div>
-                  <p className="text-gray-600">Get your Korean name with pronunciation guide</p>
+                  <p className="text-gray-600">Get your Korean name with AI-generated audio pronunciation</p>
                 </div>
               </div>
             </CardContent>

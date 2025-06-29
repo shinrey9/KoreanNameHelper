@@ -3,22 +3,23 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { conversionRequestSchema } from "@shared/schema";
 import { transliterationService } from "./services/transliteration";
-import { textToSpeechService } from "./services/textToSpeech";
+import { aiTransliterationService } from "./services/aiTransliteration";
+import { aiTextToSpeechService } from "./services/aiTextToSpeech";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Convert name to Korean
+  // Convert name to Korean using AI
   app.post("/api/convert", async (req, res) => {
     try {
       const { name, sourceLanguage } = conversionRequestSchema.parse(req.body);
       
       // Auto-detect language if requested
       const detectedLanguage = sourceLanguage === 'auto' 
-        ? transliterationService.detectLanguage(name)
+        ? await aiTransliterationService.detectLanguage(name)
         : sourceLanguage;
       
-      // Convert to Korean
-      const result = transliterationService.convertToKorean(name, detectedLanguage);
+      // Convert to Korean using AI
+      const result = await aiTransliterationService.convertToKorean(name, detectedLanguage);
       
       // Store conversion
       const conversion = await storage.createConversion({
@@ -62,14 +63,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      if (!textToSpeechService.validateKoreanText(text)) {
+      if (!aiTextToSpeechService.validateKoreanText(text)) {
         return res.status(400).json({
           success: false,
           error: 'Text must contain Korean characters'
         });
       }
       
-      const result = await textToSpeechService.generateKoreanAudio(text, {
+      const result = await aiTextToSpeechService.generateKoreanAudio(text, {
         voice,
         rate: rate || 1.0,
         pitch: pitch || 1.0
