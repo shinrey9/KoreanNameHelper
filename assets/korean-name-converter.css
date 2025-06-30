@@ -1,0 +1,244 @@
+/* Korean Name Converter Plugin Styles */
+.knc-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.knc-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.knc-header h2 {
+    color: #1f2937;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.knc-header p {
+    color: #6b7280;
+    font-size: 16px;
+    margin: 0;
+}
+
+.knc-form {
+    margin-bottom: 30px;
+}
+
+.knc-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .knc-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.knc-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.knc-field label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.knc-field select,
+.knc-field input {
+    padding: 12px 16px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s ease;
+    background: white;
+}
+
+.knc-field select:focus,
+.knc-field input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.knc-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.knc-btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.knc-btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.knc-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.knc-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.knc-btn-outline {
+    background: transparent;
+    color: #3b82f6;
+    border: 2px solid #3b82f6;
+}
+
+.knc-btn-outline:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.knc-loading {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.knc-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: knc-spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes knc-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.knc-results {
+    margin-top: 30px;
+}
+
+.knc-result-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+
+.knc-result-card h3 {
+    color: #1e293b;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.knc-korean-name {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.knc-romanization {
+    font-size: 24px;
+    color: #64748b;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.knc-audio-controls {
+    margin: 20px 0;
+}
+
+.knc-breakdown {
+    margin-top: 24px;
+    text-align: left;
+}
+
+.knc-breakdown h4 {
+    color: #1e293b;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.knc-breakdown-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.knc-breakdown-hangul {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-right: 12px;
+    min-width: 40px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.knc-breakdown-roman {
+    font-size: 14px;
+    color: #64748b;
+    margin-right: 12px;
+}
+
+.knc-breakdown-type {
+    font-size: 12px;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+.knc-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.knc-error p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Load Google Fonts for Korean support */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap');
