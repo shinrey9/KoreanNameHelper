@@ -18,6 +18,16 @@ export const conversions = pgTable("conversions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const seoSettings = pgTable("seo_settings", {
+  id: serial("id").primaryKey(),
+  pageTitle: text("page_title").notNull(),
+  metaDescription: text("meta_description").notNull(),
+  ogTitle: text("og_title").notNull(),
+  ogDescription: text("og_description").notNull(),
+  keywords: text("keywords").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -33,8 +43,24 @@ export const conversionRequestSchema = z.object({
   sourceLanguage: z.string().min(2, "Invalid language code"),
 });
 
+export const insertSeoSettingsSchema = createInsertSchema(seoSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const seoSettingsUpdateSchema = z.object({
+  pageTitle: z.string().min(1, "Page title is required").max(200, "Title too long"),
+  metaDescription: z.string().min(1, "Meta description is required").max(300, "Description too long"),
+  ogTitle: z.string().min(1, "OG title is required").max(200, "Title too long"),
+  ogDescription: z.string().min(1, "OG description is required").max(300, "Description too long"),
+  keywords: z.string().min(1, "Keywords are required").max(500, "Keywords too long"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversion = z.infer<typeof insertConversionSchema>;
 export type Conversion = typeof conversions.$inferSelect;
 export type ConversionRequest = z.infer<typeof conversionRequestSchema>;
+export type InsertSeoSettings = z.infer<typeof insertSeoSettingsSchema>;
+export type SeoSettings = typeof seoSettings.$inferSelect;
+export type SeoSettingsUpdate = z.infer<typeof seoSettingsUpdateSchema>;

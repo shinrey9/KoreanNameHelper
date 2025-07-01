@@ -108,6 +108,23 @@ A web application that converts names from various languages to Korean Hangul wi
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **January 1, 2025**: Simplified Chinese pronunciation handling to use only original country pronunciation
+- **January 1, 2025**: Added SEO admin panel at `/admin` route for managing page metadata
+- **January 1, 2025**: Implemented AI-powered Korean transliteration using OpenAI GPT-4o
+- **June 29, 2025**: Initial project setup
+
+## Admin Features
+
+### SEO Management
+- **Admin Panel**: Accessible at `/admin` route
+- **API Endpoints**: 
+  - `GET /api/admin/seo` - Get current SEO settings
+  - `PUT /api/admin/seo` - Update SEO settings
+- **Editable Fields**: Page title, meta description, Open Graph title/description, keywords
+- **Storage**: In-memory storage with default SEO-optimized content
+
 ## Changelog
 
 Changelog:

@@ -1,4 +1,4 @@
-import { users, conversions, type User, type InsertUser, type Conversion, type InsertConversion } from "@shared/schema";
+import { users, conversions, type User, type InsertUser, type Conversion, type InsertConversion, type SeoSettings, type InsertSeoSettings } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -7,11 +7,14 @@ export interface IStorage {
   createConversion(conversion: InsertConversion): Promise<Conversion>;
   getRecentConversions(limit?: number): Promise<Conversion[]>;
   getConversionsByName(name: string): Promise<Conversion[]>;
+  getSeoSettings(): Promise<SeoSettings | undefined>;
+  updateSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private conversions: Map<number, Conversion>;
+  private seoSettings: SeoSettings | undefined;
   private currentUserId: number;
   private currentConversionId: number;
 
@@ -20,6 +23,17 @@ export class MemStorage implements IStorage {
     this.conversions = new Map();
     this.currentUserId = 1;
     this.currentConversionId = 1;
+    
+    // Initialize with default SEO settings
+    this.seoSettings = {
+      id: 1,
+      pageTitle: "Korean Name Pronunciation Tool - Convert Your Name to Korean",
+      metaDescription: "Convert your name from any language to Korean Hangul with accurate pronunciation guides and audio playback. AI-powered multilingual name transliteration.",
+      ogTitle: "Discover Your Korean Name - AI-Powered Name Converter",
+      ogDescription: "Enter your name and instantly see how it's written and pronounced in Korean. Perfect for learning Korean or creating Korean social media profiles.",
+      keywords: "Korean name converter, Hangul transliteration, Korean pronunciation, name translation, multilingual converter",
+      updatedAt: new Date(),
+    };
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -61,6 +75,20 @@ export class MemStorage implements IStorage {
       .filter(conversion => 
         conversion.originalName.toLowerCase().includes(name.toLowerCase())
       );
+  }
+
+  async getSeoSettings(): Promise<SeoSettings | undefined> {
+    return this.seoSettings;
+  }
+
+  async updateSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings> {
+    const updatedSettings: SeoSettings = {
+      id: this.seoSettings?.id || 1,
+      ...settings,
+      updatedAt: new Date(),
+    };
+    this.seoSettings = updatedSettings;
+    return updatedSettings;
   }
 }
 

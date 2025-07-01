@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { conversionRequestSchema } from "@shared/schema";
+import { conversionRequestSchema, seoSettingsUpdateSchema } from "@shared/schema";
 import { transliterationService } from "./services/transliteration";
 import { aiTransliterationService } from "./services/aiTransliteration";
 import { aiTextToSpeechService } from "./services/aiTextToSpeech";
@@ -166,6 +166,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: 'Failed to search conversions'
       });
     }
+  });
+
+  // Get SEO settings
+  app.get("/api/admin/seo", async (req, res) => {
+    try {
+      const seoSettings = await storage.getSeoSettings();
+      res.json({
+        success: true,
+        data: seoSettings
+      });
+    } catch (error) {
+      console.error('Failed to get SEO settings:', error);
+      res.status(500).json({ success: false, error: 'Failed to get SEO settings' });
+    }
+  });
+
+  // Update SEO settings
+  app.put("/api/admin/seo", async (req, res) => {
+    try {
+      const validatedData = seoSettingsUpdateSchema.parse(req.body);
+      const updatedSettings = await storage.updateSeoSettings(validatedData);
+      
+      res.json({
+        success: true,
+        data: updatedSettings
+      });
+    } catch (error) {
+      console.error('Failed to update SEO settings:', error);
+      res.status(500).json({ success: false, error: 'Failed to update SEO settings' });
+    }
+  });
+
+  // Admin page route
+  app.get("/admin", (req, res) => {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - SEO Settings</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 600; margin-bottom: 5px; }
+    input, textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    textarea { min-height: 80px; resize: vertical; }
+    button { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0052a3; }
+    .success { color: #059669; margin-top: 10px; }
+    .error { color: #dc2626; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>SEO Settings Admin</h1>
+  <form id="seoForm">
+    <div class="form-group">
+      <label for="pageTitle">Page Title</label>
+      <input type="text" id="pageTitle" name="pageTitle" required maxlength="200">
+    </div>
+    <div class="form-group">
+      <label for="metaDescription">Meta Description</label>
+      <textarea id="metaDescription" name="metaDescription" required maxlength="300"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="ogTitle">Open Graph Title</label>
+      <input type="text" id="ogTitle" name="ogTitle" required maxlength="200">
+    </div>
+    <div class="form-group">
+      <label for="ogDescription">Open Graph Description</label>
+      <textarea id="ogDescription" name="ogDescription" required maxlength="300"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="keywords">Keywords (comma separated)</label>
+      <input type="text" id="keywords" name="keywords" required maxlength="500">
+    </div>
+    <button type="submit">Update SEO Settings</button>
+    <div id="message"></div>
+  </form>
+
+  <script>
+    async function loadSettings() {
+      try {
+        const response = await fetch('/api/admin/seo');
+        const result = await response.json();
+        if (result.success && result.data) {
+          const data = result.data;
+          document.getElementById('pageTitle').value = data.pageTitle || '';
+          document.getElementById('metaDescription').value = data.metaDescription || '';
+          document.getElementById('ogTitle').value = data.ogTitle || '';
+          document.getElementById('ogDescription').value = data.ogDescription || '';
+          document.getElementById('keywords').value = data.keywords || '';
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    }
+
+    document.getElementById('seoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      const messageEl = document.getElementById('message');
+
+      try {
+        const response = await fetch('/api/admin/seo', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          messageEl.innerHTML = '<div class="success">SEO settings updated successfully!</div>';
+        } else {
+          messageEl.innerHTML = '<div class="error">Error: ' + (result.error || 'Unknown error') + '</div>';
+        }
+      } catch (error) {
+        messageEl.innerHTML = '<div class="error">Error updating settings: ' + error.message + '</div>';
+      }
+    });
+
+    loadSettings();
+  </script>
+</body>
+</html>`;
+    res.send(html);
   });
 
   const httpServer = createServer(app);
