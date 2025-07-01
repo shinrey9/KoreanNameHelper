@@ -97,29 +97,34 @@ SPECIAL INSTRUCTION FOR CHINESE CHARACTERS: This is a Chinese character name. Us
 
     return basePrompt + `
 
+CRITICAL REQUIREMENT: Create breakdown by COMPLETE WORDS only, never by individual syllables.
+
+For example:
+- "Keanu Charles Reeves" should have 3 breakdown entries: "키아누" (given), "찰스" (middle), "리브스" (family) 
+- "John Smith" should have 2 breakdown entries: "존" (given), "스미스" (family)
+- "María José García" should have 3 breakdown entries: "마리아" (given), "호세" (middle), "가르시아" (family)
+
+DO NOT break down "키아누" into "키", "아", "누" - keep complete words together.
+
 Provide your response in JSON format with these exact fields:
 {
-  "korean_name": "Korean Hangul characters",
+  "korean_name": "Korean Hangul characters with spaces between words",
   "romanization": "Romanized pronunciation using Revised Romanization of Korean",
   "breakdown": [
     {
-      "hangul": "Korean word part",
-      "romanization": "romanized pronunciation", 
-      "type": "family or given"
+      "hangul": "Complete Korean word (multiple syllables)",
+      "romanization": "romanized pronunciation for this complete word", 
+      "type": "family or given or middle"
     }
   ]
 }
 
-Examples for word-by-word breakdown:
+Examples for WORD-BY-WORD breakdown (NOT syllable-by-syllable):
 - "John Smith" → breakdown: [{"hangul": "존", "romanization": "jon", "type": "given"}, {"hangul": "스미스", "romanization": "seu-mi-seu", "type": "family"}]
-- "María García" → breakdown: [{"hangul": "마리아", "romanization": "ma-ri-a", "type": "given"}, {"hangul": "가르시아", "romanization": "ga-reu-si-a", "type": "family"}]
-- "François Dubois" → breakdown: [{"hangul": "프랑수아", "romanization": "peu-rang-su-a", "type": "given"}, {"hangul": "뒤부아", "romanization": "dwi-bu-a", "type": "family"}]
+- "Keanu Charles Reeves" → breakdown: [{"hangul": "키아누", "romanization": "ki-a-nu", "type": "given"}, {"hangul": "찰스", "romanization": "chal-seu", "type": "middle"}, {"hangul": "리브스", "romanization": "ri-beu-seu", "type": "family"}]
+- "María José García" → breakdown: [{"hangul": "마리아", "romanization": "ma-ri-a", "type": "given"}, {"hangul": "호세", "romanization": "ho-se", "type": "middle"}, {"hangul": "가르시아", "romanization": "ga-reu-si-a", "type": "family"}]
 
-Important: Break down by WORDS (first name, last name, middle names), not individual syllables. Each entry in breakdown should represent a complete word from the original name.
-
-IMPORTANT: For the romanization field, use word-based spacing that matches the breakdown structure. For example:
-- 존 스미스 should be romanized as "jon seu-mi-seu" (given name + family name)
-- 마리아 가르시아 should be romanized as "ma-ri-a ga-reu-si-a" (given name + family name)`;
+REMEMBER: Each breakdown entry must be a COMPLETE WORD from the original name, not individual syllables.`;
   }
 
   async detectLanguage(text: string): Promise<string> {
