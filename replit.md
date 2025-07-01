@@ -112,4 +112,3 @@ Preferred communication style: Simple, everyday language.
 
 Changelog:
 - June 29, 2025. Initial setup
-- June 29, 2025. Created WordPress plugin version with shortcode support, admin settings, and AJAX functionality
