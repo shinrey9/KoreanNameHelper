@@ -1,94 +1,170 @@
-import { Router } from "express";
+import type { Express } from "express";
+import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { conversionRequestSchema, seoSettingsUpdateSchema, aiSettingsUpdateSchema } from "@shared/schema";
 import { transliterationService } from "./services/transliteration";
 import { aiTransliterationService } from "./services/aiTransliteration";
-import { textToSpeechService } from "./services/textToSpeech";
 import { aiTextToSpeechService } from "./services/aiTextToSpeech";
-import type { Express } from "express";
-import { createServer, type Server } from "http";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // API Routes
-
-  // Convert name to Korean
+  
+  // Convert name to Korean using AI
   app.post("/api/convert", async (req, res) => {
     try {
       const { name, sourceLanguage } = conversionRequestSchema.parse(req.body);
       
-      // Use AI service for conversion
-      const result = await aiTransliterationService.convertToKorean(name, sourceLanguage);
+      // Auto-detect language if requested
+      const detectedLanguage = sourceLanguage === 'auto' 
+        ? await aiTransliterationService.detectLanguage(name)
+        : sourceLanguage;
       
-      // Store in database
+      // Convert to Korean using AI
+      const result = await aiTransliterationService.convertToKorean(name, detectedLanguage);
+      
+      // Store conversion
       const conversion = await storage.createConversion({
         originalName: name,
-        sourceLanguage: sourceLanguage,
+        sourceLanguage: detectedLanguage,
         koreanName: result.koreanName,
         romanization: result.romanization,
-        breakdown: JSON.stringify(result.breakdown),
+        breakdown: JSON.stringify(result.breakdown)
       });
-
+      
       res.json({
         success: true,
         data: {
-          ...conversion,
-          breakdown: result.breakdown,
-        },
+          id: conversion.id,
+          originalName: name,
+          sourceLanguage: detectedLanguage,
+          koreanName: result.koreanName,
+          romanization: result.romanization,
+          breakdown: result.breakdown
+        }
       });
-    } catch (error) {
-      console.error("Conversion error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: "Failed to convert name" 
+      
+    } catch (error: any) {
+      console.error('Conversion error:', error);
+      res.status(400).json({
+        success: false,
+        error: error.message || 'Failed to convert name'
       });
     }
   });
-
-  // Generate Korean audio
+  
+  // Generate audio for Korean pronunciation
   app.post("/api/tts", async (req, res) => {
     try {
-      const { text } = req.body;
+      const { text, voice, rate, pitch } = req.body;
       
-      if (!text || typeof text !== "string") {
+      if (!text) {
         return res.status(400).json({
           success: false,
-          error: "Text is required",
+          error: 'Text is required'
         });
       }
-
-      // Use AI TTS service
-      const result = await aiTextToSpeechService.generateKoreanAudio(text);
+      
+      if (!aiTextToSpeechService.validateKoreanText(text)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Text must contain Korean characters'
+        });
+      }
+      
+      const result = await aiTextToSpeechService.generateKoreanAudio(text, {
+        voice,
+        rate: rate || 1.0,
+        pitch: pitch || 1.0
+      });
       
       if (result.error) {
         return res.status(500).json({
           success: false,
-          error: result.error,
+          error: result.error
         });
       }
-
+      
       res.json({
         success: true,
         data: {
           audioUrl: result.audioUrl,
-        },
+          text
+        }
       });
-    } catch (error) {
-      console.error("TTS error:", error);
+      
+    } catch (error: any) {
+      console.error('TTS error:', error);
       res.status(500).json({
         success: false,
-        error: "Failed to generate audio",
+        error: 'Failed to generate audio'
       });
     }
   });
-
+  
   // Get recent conversions
-  app.get("/api/recent-conversions", async (req, res) => {
+  app.get("/api/conversions", async (req, res) => {
     try {
-      const conversions = await storage.getRecentConversions(10);
-      res.json(conversions);
-    } catch (error) {
-      console.error("Failed to get recent conversions:", error);
-      res.status(500).json({ success: false, error: "Failed to get conversions" });
+      const limit = parseInt(req.query.limit as string) || 10;
+      const conversions = await storage.getRecentConversions(limit);
+      
+      const formatted = conversions.map(conv => ({
+        id: conv.id,
+        originalName: conv.originalName,
+        sourceLanguage: conv.sourceLanguage,
+        koreanName: conv.koreanName,
+        romanization: conv.romanization,
+        breakdown: JSON.parse(conv.breakdown),
+        createdAt: conv.createdAt
+      }));
+      
+      res.json({
+        success: true,
+        data: formatted
+      });
+      
+    } catch (error: any) {
+      console.error('Get conversions error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch conversions'
+      });
+    }
+  });
+  
+  // Search conversions by name
+  app.get("/api/conversions/search", async (req, res) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: 'Search query is required'
+        });
+      }
+      
+      const conversions = await storage.getConversionsByName(q);
+      
+      const formatted = conversions.map(conv => ({
+        id: conv.id,
+        originalName: conv.originalName,
+        sourceLanguage: conv.sourceLanguage,
+        koreanName: conv.koreanName,
+        romanization: conv.romanization,
+        breakdown: JSON.parse(conv.breakdown),
+        createdAt: conv.createdAt
+      }));
+      
+      res.json({
+        success: true,
+        data: formatted
+      });
+      
+    } catch (error: any) {
+      console.error('Search conversions error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to search conversions'
+      });
     }
   });
 
@@ -97,6 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const pagePath = req.query.pagePath as string;
       if (!pagePath) {
+        // Return all SEO settings if no specific page requested
         const allSeoSettings = await storage.getAllSeoSettings();
         res.json({
           success: true,
@@ -136,6 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/ai", async (req, res) => {
     try {
       const aiSettings = await storage.getAiSettings();
+      // Don't expose the full API key, only show first/last few characters
       const safeSettings = aiSettings ? {
         ...aiSettings,
         openaiApiKey: aiSettings.openaiApiKey ? `${aiSettings.openaiApiKey.slice(0, 7)}...${aiSettings.openaiApiKey.slice(-4)}` : ""
@@ -161,7 +239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         data: {
           ...updatedSettings,
-          openaiApiKey: updatedSettings.openaiApiKey ? `${updatedSettings.openaiApiKey.slice(0, 7)}...${updatedSettings.openaiApiKey.slice(-4)}` : ""
+          openaiApiKey: `${updatedSettings.openaiApiKey.slice(0, 7)}...${updatedSettings.openaiApiKey.slice(-4)}`
         }
       });
     } catch (error) {
@@ -170,14 +248,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin page route
+  // Admin page route - temporarily disabled for compilation
   app.get("/admin", (req, res) => {
-    res.send(`<!DOCTYPE html>
+    res.send('<h1>Admin Panel - Under Construction</h1><p>The admin panel is being updated for the new multi-page structure.</p>');
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Language Tools</title>
+  <title>Admin Panel - Korean Name Tool</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; max-width: 1000px; margin: 40px auto; padding: 20px; }
     .tabs { margin-bottom: 30px; border-bottom: 1px solid #ddd; }
@@ -191,13 +269,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     textarea { min-height: 80px; resize: vertical; }
     button { background: #0066cc; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
     button:hover { background: #0052a3; }
-    .success { color: #22c55e; font-weight: 600; margin: 10px 0; }
-    .error { color: #ef4444; font-weight: 600; margin: 10px 0; }
-    .warning { background: #fef3c7; border: 1px solid #f59e0b; padding: 12px; border-radius: 4px; margin-bottom: 20px; }
+    .success { color: #059669; margin-top: 10px; }
+    .error { color: #dc2626; margin-top: 10px; }
+    .warning { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 15px; }
   </style>
 </head>
 <body>
   <h1>Admin Panel</h1>
+  
   <div class="tabs">
     <div class="tab active" onclick="showTab('seo')">SEO Settings</div>
     <div class="tab" onclick="showTab('ai')">AI Configuration</div>
@@ -237,6 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       <div id="seo-message"></div>
     </form>
   </div>
+
   <div id="ai-tab" class="tab-content">
     <h2>AI Configuration</h2>
     <div class="warning">
@@ -258,22 +338,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       </div>
       <div class="form-group">
         <label for="openaiApiKey">OpenAI API Key</label>
-        <input type="password" id="openaiApiKey" name="openaiApiKey" required placeholder="Enter your OpenAI API key">
-        <small style="color: #666; margin-top: 4px; display: block;">This key is used for AI-powered Korean name conversion.</small>
+        <input type="password" id="openaiApiKey" name="openaiApiKey" required minlength="10" placeholder="sk-...">
+        <small style="color: #666;">Your API key is stored securely and only partially visible for verification.</small>
       </div>
       <button type="submit">Update AI Settings</button>
       <div id="ai-message"></div>
     </form>
   </div>
+
   <script>
     function showTab(tabName) {
+      // Hide all tab contents
       document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
       });
+      // Remove active class from all tabs
       document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
       });
+      
+      // Show selected tab content
       document.getElementById(tabName + '-tab').classList.add('active');
+      // Add active class to clicked tab
       event.target.classList.add('active');
     }
 
@@ -303,6 +389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (result.success && result.data) {
           const data = result.data;
           document.getElementById('openaiModel').value = data.openaiModel || 'gpt-4o';
+          // Don't populate the API key field for security
         }
       } catch (error) {
         console.error('Error loading AI settings:', error);
@@ -349,6 +436,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const result = await response.json();
         if (result.success) {
           messageEl.innerHTML = '<div class="success">AI settings updated successfully!</div>';
+          // Clear the API key field after successful update
           document.getElementById('openaiApiKey').value = '';
         } else {
           messageEl.innerHTML = '<div class="error">Error: ' + (result.error || 'Unknown error') + '</div>';
@@ -358,11 +446,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
 
+    // Load settings on page load
     loadSeoSettings();
     loadAiSettings();
   </script>
 </body>
-</html>`);
+</html>`;
+    res.send(html);
   });
 
   const httpServer = createServer(app);

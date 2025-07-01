@@ -7,8 +7,9 @@ export interface IStorage {
   createConversion(conversion: InsertConversion): Promise<Conversion>;
   getRecentConversions(limit?: number): Promise<Conversion[]>;
   getConversionsByName(name: string): Promise<Conversion[]>;
-  getSeoSettings(): Promise<SeoSettings | undefined>;
+  getSeoSettings(pagePath: string): Promise<SeoSettings | undefined>;
   updateSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings>;
+  getAllSeoSettings(): Promise<SeoSettings[]>;
   getAiSettings(): Promise<AiSettings | undefined>;
   updateAiSettings(settings: InsertAiSettings): Promise<AiSettings>;
 }
@@ -16,20 +17,35 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private conversions: Map<number, Conversion>;
-  private seoSettings: SeoSettings | undefined;
+  private seoSettings: Map<string, SeoSettings>;
   private aiSettings: AiSettings | undefined;
   private currentUserId: number;
   private currentConversionId: number;
+  private currentSeoId: number;
 
   constructor() {
     this.users = new Map();
     this.conversions = new Map();
+    this.seoSettings = new Map();
     this.currentUserId = 1;
     this.currentConversionId = 1;
+    this.currentSeoId = 1;
     
-    // Initialize with default SEO settings
-    this.seoSettings = {
-      id: 1,
+    // Initialize with default SEO settings for different pages
+    const homepageSeo: SeoSettings = {
+      id: this.currentSeoId++,
+      pagePath: "/",
+      pageTitle: "Multi-Language Conversion Tools - Convert Names & More",
+      metaDescription: "Access powerful conversion tools for names, text, and more. Convert names to Korean, Chinese, and other languages with AI-powered accuracy.",
+      ogTitle: "Multi-Language Conversion Tools - Your Gateway to Global Languages",
+      ogDescription: "Discover our suite of language conversion tools. Perfect for learning languages, creating international profiles, and understanding global cultures.",
+      keywords: "language converter, name converter, multilingual tools, translation tools, Korean converter, Chinese converter",
+      updatedAt: new Date(),
+    };
+    
+    const koreanConverterSeo: SeoSettings = {
+      id: this.currentSeoId++,
+      pagePath: "/korean-name-converter",
       pageTitle: "Korean Name Pronunciation Tool - Convert Your Name to Korean",
       metaDescription: "Convert your name from any language to Korean Hangul with accurate pronunciation guides and audio playback. AI-powered multilingual name transliteration.",
       ogTitle: "Discover Your Korean Name - AI-Powered Name Converter",
@@ -37,6 +53,9 @@ export class MemStorage implements IStorage {
       keywords: "Korean name converter, Hangul transliteration, Korean pronunciation, name translation, multilingual converter",
       updatedAt: new Date(),
     };
+    
+    this.seoSettings.set("/", homepageSeo);
+    this.seoSettings.set("/korean-name-converter", koreanConverterSeo);
 
     // Initialize with default AI settings
     this.aiSettings = {
@@ -88,17 +107,22 @@ export class MemStorage implements IStorage {
       );
   }
 
-  async getSeoSettings(): Promise<SeoSettings | undefined> {
-    return this.seoSettings;
+  async getSeoSettings(pagePath: string): Promise<SeoSettings | undefined> {
+    return this.seoSettings.get(pagePath);
+  }
+
+  async getAllSeoSettings(): Promise<SeoSettings[]> {
+    return Array.from(this.seoSettings.values());
   }
 
   async updateSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings> {
+    const existingSettings = this.seoSettings.get(settings.pagePath);
     const updatedSettings: SeoSettings = {
-      id: this.seoSettings?.id || 1,
+      id: existingSettings?.id || this.currentSeoId++,
       ...settings,
       updatedAt: new Date(),
     };
-    this.seoSettings = updatedSettings;
+    this.seoSettings.set(settings.pagePath, updatedSettings);
     return updatedSettings;
   }
 

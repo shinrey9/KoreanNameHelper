@@ -20,6 +20,7 @@ export const conversions = pgTable("conversions", {
 
 export const seoSettings = pgTable("seo_settings", {
   id: serial("id").primaryKey(),
+  pagePath: text("page_path").notNull().unique(), // e.g., "/", "/korean-name-converter"
   pageTitle: text("page_title").notNull(),
   metaDescription: text("meta_description").notNull(),
   ogTitle: text("og_title").notNull(),
@@ -56,11 +57,16 @@ export const insertSeoSettingsSchema = createInsertSchema(seoSettings).omit({
 });
 
 export const seoSettingsUpdateSchema = z.object({
+  pagePath: z.string().min(1, "Page path is required"),
   pageTitle: z.string().min(1, "Page title is required").max(200, "Title too long"),
   metaDescription: z.string().min(1, "Meta description is required").max(300, "Description too long"),
   ogTitle: z.string().min(1, "OG title is required").max(200, "Title too long"),
   ogDescription: z.string().min(1, "OG description is required").max(300, "Description too long"),
   keywords: z.string().min(1, "Keywords are required").max(500, "Keywords too long"),
+});
+
+export const seoSettingsRequestSchema = z.object({
+  pagePath: z.string().min(1, "Page path is required"),
 });
 
 export const insertAiSettingsSchema = createInsertSchema(aiSettings).omit({
@@ -81,6 +87,7 @@ export type ConversionRequest = z.infer<typeof conversionRequestSchema>;
 export type InsertSeoSettings = z.infer<typeof insertSeoSettingsSchema>;
 export type SeoSettings = typeof seoSettings.$inferSelect;
 export type SeoSettingsUpdate = z.infer<typeof seoSettingsUpdateSchema>;
+export type SeoSettingsRequest = z.infer<typeof seoSettingsRequestSchema>;
 export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;
 export type AiSettings = typeof aiSettings.$inferSelect;
 export type AiSettingsUpdate = z.infer<typeof aiSettingsUpdateSchema>;

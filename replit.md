@@ -2,7 +2,7 @@
 
 ## Overview
 
-A web application that converts names from various languages to Korean Hangul with accurate pronunciation guides and audio playback. The app supports multiple source languages including English, Spanish, French, German, and many others, providing users with Korean transliterations along with romanized pronunciations.
+A multi-tool language conversion platform with a central homepage that provides access to various conversion tools. Currently features a Korean name converter that translates names from multiple languages to Korean Hangul with accurate pronunciation guides and audio playback. The platform is designed to expand with additional language conversion tools, each with individual SEO configuration capabilities.
 
 ## System Architecture
 
@@ -48,14 +48,18 @@ A web application that converts names from various languages to Korean Hangul wi
    - In-memory implementation for development
    - PostgreSQL implementation for production
 
-### Frontend Components
-1. **LanguageConverter** - Input form with language selection
-2. **ConversionResults** - Display Korean name with pronunciation
-3. **AudioPlayer** - Korean pronunciation playback with Web Speech API fallback
+### Frontend Components & Pages
+1. **Homepage** (`/`) - Central landing page showcasing available conversion tools
+2. **Korean Name Converter** (`/korean-name-converter`) - Dedicated page for Korean name conversion
+3. **LanguageConverter** - Input form with language selection
+4. **ConversionResults** - Display Korean name with pronunciation
+5. **AudioPlayer** - Korean pronunciation playback with Web Speech API fallback
 
 ### Database Schema
 - **Users Table**: Basic user authentication (username, password)
 - **Conversions Table**: Stores conversion history with breakdown data
+- **SEO Settings Table**: Per-page SEO configuration (page_path, title, description, etc.)
+- **AI Settings Table**: OpenAI model and API key configuration
 - All tables use serial primary keys with timestamp tracking
 
 ## Data Flow
@@ -110,6 +114,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 1, 2025**: Created multi-page architecture with separate homepage and tool pages
+- **July 1, 2025**: Added per-page SEO configuration system supporting individual page metadata
+- **July 1, 2025**: Added GPT-4.1, GPT-4.1 Mini, and GPT-4.1 Nano model options to admin panel
+- **July 1, 2025**: Restructured app into multi-tool platform with homepage linking to individual converters
 - **January 1, 2025**: Simplified Chinese pronunciation handling to use only original country pronunciation
 - **January 1, 2025**: Added SEO admin panel at `/admin` route for managing page metadata
 - **January 1, 2025**: Implemented AI-powered Korean transliteration using OpenAI GPT-4o
