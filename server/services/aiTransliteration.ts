@@ -1,7 +1,7 @@
 import OpenAI from "openai";
+import { storage } from "../storage";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// OpenAI client will be initialized with dynamic settings
 
 interface CharacterBreakdown {
   hangul: string;
@@ -21,8 +21,14 @@ class AITransliterationService {
     try {
       const prompt = this.buildPrompt(name, sourceLanguage);
       
+      // Get current AI settings for model and API key
+      const aiSettings = await storage.getAiSettings();
+      const model = aiSettings?.openaiModel || "gpt-4o";
+      const apiKey = aiSettings?.openaiApiKey || process.env.OPENAI_API_KEY || "";
+      
+      const openai = new OpenAI({ apiKey });
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: model,
         messages: [
           {
             role: "system",
@@ -119,8 +125,14 @@ IMPORTANT: For the romanization field, separate each Korean syllable with spaces
 
   async detectLanguage(text: string): Promise<string> {
     try {
+      // Get current AI settings for model and API key
+      const aiSettings = await storage.getAiSettings();
+      const model = aiSettings?.openaiModel || "gpt-4o";
+      const apiKey = aiSettings?.openaiApiKey || process.env.OPENAI_API_KEY || "";
+      
+      const openai = new OpenAI({ apiKey });
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: model,
         messages: [
           {
             role: "system", 

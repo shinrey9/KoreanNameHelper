@@ -307,6 +307,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       <div class="form-group">
         <label for="openaiModel">OpenAI Model</label>
         <select id="openaiModel" name="openaiModel" required>
+          <option value="gpt-4.1">GPT-4.1 (Newest, Most Capable)</option>
+          <option value="gpt-4.1-mini">GPT-4.1 Mini (Balanced Performance)</option>
+          <option value="gpt-4.1-nano">GPT-4.1 Nano (Fastest, Most Efficient)</option>
           <option value="gpt-4o">GPT-4o (Latest, Recommended)</option>
           <option value="gpt-4o-mini">GPT-4o Mini (Faster, Lower Cost)</option>
           <option value="gpt-4-turbo">GPT-4 Turbo</option>
