@@ -8,6 +8,43 @@ import { aiTextToSpeechService } from "./services/aiTextToSpeech";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 
+// Helper function to group syllables into words
+function groupSyllablesIntoWords(breakdown: any[], originalName: string) {
+  // If breakdown already has multi-syllable entries, return as is
+  const hasMultiSyllableEntries = breakdown.some(item => item.hangul.length > 1);
+  if (hasMultiSyllableEntries) {
+    return breakdown;
+  }
+
+  // Group syllables by type (given, middle, family)
+  const grouped: any[] = [];
+  let currentGroup: any = null;
+
+  for (const item of breakdown) {
+    if (!currentGroup || currentGroup.type !== item.type) {
+      // Start new group
+      if (currentGroup) {
+        grouped.push(currentGroup);
+      }
+      currentGroup = {
+        hangul: item.hangul,
+        romanization: item.romanization,
+        type: item.type
+      };
+    } else {
+      // Add to current group
+      currentGroup.hangul += item.hangul;
+      currentGroup.romanization += `-${item.romanization}`;
+    }
+  }
+  
+  if (currentGroup) {
+    grouped.push(currentGroup);
+  }
+
+  return grouped.length > 0 ? grouped : breakdown;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes
 
@@ -19,20 +56,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use AI service for conversion
       const result = await aiTransliterationService.convertToKorean(name, sourceLanguage);
       
+      // Group syllables into words if AI still returns individual syllables
+      const processedBreakdown = groupSyllablesIntoWords(result.breakdown, name);
+      
       // Store in database
       const conversion = await storage.createConversion({
         originalName: name,
         sourceLanguage: sourceLanguage,
         koreanName: result.koreanName,
         romanization: result.romanization,
-        breakdown: JSON.stringify(result.breakdown),
+        breakdown: JSON.stringify(processedBreakdown),
       });
 
       res.json({
         success: true,
         data: {
           ...conversion,
-          breakdown: result.breakdown,
+          breakdown: processedBreakdown,
         },
       });
     } catch (error) {

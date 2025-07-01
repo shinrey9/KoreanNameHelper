@@ -99,10 +99,16 @@ SPECIAL INSTRUCTION FOR CHINESE CHARACTERS: This is a Chinese character name. Us
 
 CRITICAL REQUIREMENT: Create breakdown by COMPLETE WORDS only, never by individual syllables.
 
+WRONG WAY (DO NOT DO THIS):
+"Keanu Charles Reeves" → [{"hangul":"키","type":"given"}, {"hangul":"아","type":"given"}, {"hangul":"누","type":"given"}, {"hangul":"찰","type":"given"}, {"hangul":"스","type":"given"}, {"hangul":"리","type":"family"}, {"hangul":"브","type":"family"}, {"hangul":"스","type":"family"}]
+
+CORRECT WAY (DO THIS):
+"Keanu Charles Reeves" → [{"hangul":"키아누","romanization":"ki-a-nu","type":"given"}, {"hangul":"찰스","romanization":"chal-seu","type":"middle"}, {"hangul":"리브스","romanization":"ri-beu-seu","type":"family"}]
+
 For example:
-- "Keanu Charles Reeves" should have 3 breakdown entries: "키아누" (given), "찰스" (middle), "리브스" (family) 
-- "John Smith" should have 2 breakdown entries: "존" (given), "스미스" (family)
-- "María José García" should have 3 breakdown entries: "마리아" (given), "호세" (middle), "가르시아" (family)
+- "Keanu Charles Reeves" should have EXACTLY 3 breakdown entries: "키아누" (given), "찰스" (middle), "리브스" (family) 
+- "John Smith" should have EXACTLY 2 breakdown entries: "존" (given), "스미스" (family)
+- "María José García" should have EXACTLY 3 breakdown entries: "마리아" (given), "호세" (middle), "가르시아" (family)
 
 DO NOT break down "키아누" into "키", "아", "누" - keep complete words together.
 

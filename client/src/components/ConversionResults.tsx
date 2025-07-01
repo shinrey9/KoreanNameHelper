@@ -137,7 +137,7 @@ export function ConversionResults({
           <CardContent className="p-6">
             <h4 className="font-medium text-gray-700 mb-4 flex items-center">
               <List className="w-4 h-4 text-gray-500 mr-2" />
-              Character Breakdown
+              Name Parts
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {data.breakdown.map((item, index) => (
