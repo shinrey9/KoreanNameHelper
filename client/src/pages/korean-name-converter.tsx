@@ -34,7 +34,8 @@ export default function KoreanNameConverter() {
   const convertMutation = useMutation({
     mutationFn: async (data: { name: string; sourceLanguage: string }) => {
       const response = await apiRequest("POST", "/api/convert", data);
-      return response.json();
+      const result = await response.json();
+      return result.data; // Extract the data field from the API response
     },
     onSuccess: (data) => {
       setConversionData(data);
@@ -57,7 +58,8 @@ export default function KoreanNameConverter() {
   const audioMutation = useMutation({
     mutationFn: async (text: string) => {
       const response = await apiRequest("POST", "/api/tts", { text });
-      return response.json();
+      const result = await response.json();
+      return result.data; // Extract the data field from the API response
     },
     onSuccess: (data) => {
       setAudioUrl(data.audioUrl);
