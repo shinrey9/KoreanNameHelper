@@ -1,4 +1,4 @@
-import { users, conversions, type User, type InsertUser, type Conversion, type InsertConversion, type SeoSettings, type InsertSeoSettings } from "@shared/schema";
+import { users, conversions, type User, type InsertUser, type Conversion, type InsertConversion, type SeoSettings, type InsertSeoSettings, type AiSettings, type InsertAiSettings } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -9,12 +9,15 @@ export interface IStorage {
   getConversionsByName(name: string): Promise<Conversion[]>;
   getSeoSettings(): Promise<SeoSettings | undefined>;
   updateSeoSettings(settings: InsertSeoSettings): Promise<SeoSettings>;
+  getAiSettings(): Promise<AiSettings | undefined>;
+  updateAiSettings(settings: InsertAiSettings): Promise<AiSettings>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private conversions: Map<number, Conversion>;
   private seoSettings: SeoSettings | undefined;
+  private aiSettings: AiSettings | undefined;
   private currentUserId: number;
   private currentConversionId: number;
 
@@ -32,6 +35,14 @@ export class MemStorage implements IStorage {
       ogTitle: "Discover Your Korean Name - AI-Powered Name Converter",
       ogDescription: "Enter your name and instantly see how it's written and pronounced in Korean. Perfect for learning Korean or creating Korean social media profiles.",
       keywords: "Korean name converter, Hangul transliteration, Korean pronunciation, name translation, multilingual converter",
+      updatedAt: new Date(),
+    };
+
+    // Initialize with default AI settings
+    this.aiSettings = {
+      id: 1,
+      openaiModel: "gpt-4o",
+      openaiApiKey: process.env.OPENAI_API_KEY || "",
       updatedAt: new Date(),
     };
   }
@@ -88,6 +99,21 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.seoSettings = updatedSettings;
+    return updatedSettings;
+  }
+
+  async getAiSettings(): Promise<AiSettings | undefined> {
+    return this.aiSettings;
+  }
+
+  async updateAiSettings(settings: InsertAiSettings): Promise<AiSettings> {
+    const updatedSettings: AiSettings = {
+      id: this.aiSettings?.id || 1,
+      openaiModel: settings.openaiModel || "gpt-4o",
+      openaiApiKey: settings.openaiApiKey || "",
+      updatedAt: new Date(),
+    };
+    this.aiSettings = updatedSettings;
     return updatedSettings;
   }
 }

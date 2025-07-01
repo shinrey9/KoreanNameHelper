@@ -28,6 +28,13 @@ export const seoSettings = pgTable("seo_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const aiSettings = pgTable("ai_settings", {
+  id: serial("id").primaryKey(),
+  openaiModel: text("openai_model").notNull().default("gpt-4o"),
+  openaiApiKey: text("openai_api_key").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -56,6 +63,16 @@ export const seoSettingsUpdateSchema = z.object({
   keywords: z.string().min(1, "Keywords are required").max(500, "Keywords too long"),
 });
 
+export const insertAiSettingsSchema = createInsertSchema(aiSettings).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const aiSettingsUpdateSchema = z.object({
+  openaiModel: z.string().min(1, "OpenAI model is required"),
+  openaiApiKey: z.string().min(1, "OpenAI API key is required").min(10, "API key too short"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversion = z.infer<typeof insertConversionSchema>;
@@ -64,3 +81,6 @@ export type ConversionRequest = z.infer<typeof conversionRequestSchema>;
 export type InsertSeoSettings = z.infer<typeof insertSeoSettingsSchema>;
 export type SeoSettings = typeof seoSettings.$inferSelect;
 export type SeoSettingsUpdate = z.infer<typeof seoSettingsUpdateSchema>;
+export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;
+export type AiSettings = typeof aiSettings.$inferSelect;
+export type AiSettingsUpdate = z.infer<typeof aiSettingsUpdateSchema>;
