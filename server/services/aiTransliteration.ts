@@ -103,24 +103,23 @@ Provide your response in JSON format with these exact fields:
   "romanization": "Romanized pronunciation using Revised Romanization of Korean",
   "breakdown": [
     {
-      "hangul": "Korean syllable",
+      "hangul": "Korean word part",
       "romanization": "romanized pronunciation", 
-      "type": "family or given or syllable"
+      "type": "family or given"
     }
   ]
 }
 
-Examples for context:
-- "John" → "존" (jon)
-- "Smith" → "스미스" (seu-mi-seu) 
-- "María" → "마리아" (ma-ri-a)
-- "François" → "프랑수아" (peu-rang-su-a)
+Examples for word-by-word breakdown:
+- "John Smith" → breakdown: [{"hangul": "존", "romanization": "jon", "type": "given"}, {"hangul": "스미스", "romanization": "seu-mi-seu", "type": "family"}]
+- "María García" → breakdown: [{"hangul": "마리아", "romanization": "ma-ri-a", "type": "given"}, {"hangul": "가르시아", "romanization": "ga-reu-si-a", "type": "family"}]
+- "François Dubois" → breakdown: [{"hangul": "프랑수아", "romanization": "peu-rang-su-a", "type": "given"}, {"hangul": "뒤부아", "romanization": "dwi-bu-a", "type": "family"}]
 
-Make sure each syllable in the breakdown corresponds to meaningful parts of the original name.
+Important: Break down by WORDS (first name, last name, middle names), not individual syllables. Each entry in breakdown should represent a complete word from the original name.
 
-IMPORTANT: For the romanization field, separate each Korean syllable with spaces or hyphens for clear pronunciation. For example:
-- 존스미스 should be romanized as "jon-seu-mi-seu" or "jon seu mi seu"
-- 마리아 should be romanized as "ma-ri-a" or "ma ri a"`;
+IMPORTANT: For the romanization field, use word-based spacing that matches the breakdown structure. For example:
+- 존 스미스 should be romanized as "jon seu-mi-seu" (given name + family name)
+- 마리아 가르시아 should be romanized as "ma-ri-a ga-reu-si-a" (given name + family name)`;
   }
 
   async detectLanguage(text: string): Promise<string> {
