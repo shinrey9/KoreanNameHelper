@@ -326,13 +326,18 @@ export default function AdminNew() {
             </DialogHeader>
             <form onSubmit={handleSeoSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="pagePath">페이지 경로</Label>
-                <Input
-                  id="pagePath"
-                  value={seoData.pagePath}
-                  onChange={(e) => setSeoData({...seoData, pagePath: e.target.value})}
-                  placeholder="/"
-                />
+                <Label htmlFor="pagePath">페이지 선택</Label>
+                <Select value={seoData.pagePath} onValueChange={(value) => setSeoData({...seoData, pagePath: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="페이지를 선택하세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="/">홈페이지 (/)</SelectItem>
+                    <SelectItem value="/korean-name-converter">한국 이름 변환기 (/korean-name-converter)</SelectItem>
+                    <SelectItem value="/admin">관리자 패널 (/admin)</SelectItem>
+                    <SelectItem value="/myadmin">새 관리자 패널 (/myadmin)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="title">페이지 제목</Label>
