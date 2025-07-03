@@ -5,7 +5,7 @@ import { Languages, ArrowRight, Sparkles, Globe, LogOut, Settings } from "lucide
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Homepage() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -17,25 +17,28 @@ export default function Homepage() {
               <Globe className="h-8 w-8 text-blue-600 mr-2" />
               <span className="text-xl font-bold text-gray-900 dark:text-white">NameAtlas</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                환영합니다, {user?.firstName || user?.email || '사용자'}님
-              </span>
-              <Link href="/admin">
-                <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  관리자
+            {/* 로그인된 관리자에게만 관리 메뉴 표시 */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  환영합니다, {user?.firstName || user?.email || '관리자'}님
+                </span>
+                <Link href="/admin">
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    관리자
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.href = "/api/logout"}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  로그아웃
                 </Button>
-              </Link>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => window.location.href = "/api/logout"}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                로그아웃
-              </Button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>
