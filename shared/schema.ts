@@ -49,9 +49,9 @@ export const seoSettings = pgTable("seo_settings", {
   pagePath: text("page_path").notNull().unique(), // e.g., "/", "/korean-name-converter"
   pageTitle: text("page_title").notNull(),
   metaDescription: text("meta_description").notNull(),
-  ogTitle: text("og_title").notNull(),
-  ogDescription: text("og_description").notNull(),
-  keywords: text("keywords").notNull(),
+  ogTitle: text("og_title").default(""),
+  ogDescription: text("og_description").default(""),
+  keywords: text("keywords").default(""),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -83,9 +83,9 @@ export const seoSettingsUpdateSchema = z.object({
   pagePath: z.string().min(1, "Page path is required"),
   pageTitle: z.string().min(1, "Page title is required").max(200, "Title too long"),
   metaDescription: z.string().min(1, "Meta description is required").max(300, "Description too long"),
-  ogTitle: z.string().min(1, "OG title is required").max(200, "Title too long"),
-  ogDescription: z.string().min(1, "OG description is required").max(300, "Description too long"),
-  keywords: z.string().min(1, "Keywords are required").max(500, "Keywords too long"),
+  ogTitle: z.string().max(200, "Title too long"),
+  ogDescription: z.string().max(300, "Description too long"),
+  keywords: z.string().max(500, "Keywords too long"),
 });
 
 export const seoSettingsRequestSchema = z.object({

@@ -142,6 +142,7 @@ export default function AdminNew() {
 
   const handleSeoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('SEO Data being submitted:', seoData);
     seoMutation.mutate(seoData);
   };
 
