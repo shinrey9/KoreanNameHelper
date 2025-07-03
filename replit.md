@@ -114,6 +114,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 3, 2025**: Fixed React Hooks rendering error - moved all Hook calls to component top before conditional rendering
 - **July 3, 2025**: Completed comprehensive admin panel implementation with all core features working
 - **July 3, 2025**: Fixed SEO settings save/load functionality - implemented proper page-specific data loading and API response parsing
 - **July 3, 2025**: Updated database schema to support optional SEO fields (ogTitle, ogDescription, keywords) with default values
@@ -121,6 +122,7 @@ Preferred communication style: Simple, everyday language.
 - **July 3, 2025**: Secured admin panel with authentication middleware protecting all admin routes (/admin, /api/admin/*)
 - **July 3, 2025**: Set up PostgreSQL database with user and session tables for production deployment
 - **July 3, 2025**: Created user-friendly authentication system - public visitors can access main site, admin features only visible when logged in
+- **July 3, 2025**: Project ready for deployment to tools.kollectionk.com subdomain via Cloudflare DNS
 - **July 3, 2025**: Implemented language-specific pronunciation rules for accurate cross-language conversion
 - **July 3, 2025**: Fixed character breakdown to display complete words instead of individual syllables
 - **July 1, 2025**: Created multi-page architecture with separate homepage and tool pages
