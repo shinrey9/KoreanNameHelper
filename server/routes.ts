@@ -176,7 +176,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update SEO settings
   app.put("/api/admin/seo", isAuthenticated, async (req, res) => {
     try {
-      console.log('Received SEO update request body:', req.body);
       const validatedData = seoSettingsUpdateSchema.parse(req.body);
       const updatedSettings = await storage.updateSeoSettings(validatedData);
       

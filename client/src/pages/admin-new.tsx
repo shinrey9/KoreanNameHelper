@@ -18,7 +18,7 @@ export default function AdminNew() {
   
   // 상태 관리
   const [seoData, setSeoData] = useState({
-    pagePath: "",
+    pagePath: "/",
     pageTitle: "",
     metaDescription: "",
     ogTitle: "",
@@ -37,8 +37,8 @@ export default function AdminNew() {
   const [showSystemModal, setShowSystemModal] = useState(false);
 
   // 데이터 조회
-  const { data: seoSettings } = useQuery({
-    queryKey: ["/api/admin/seo"],
+  const { data: seoSettings, refetch: refetchSeoSettings } = useQuery({
+    queryKey: ["/api/admin/seo", seoData.pagePath],
     enabled: isAuthenticated,
   });
 
@@ -54,9 +54,23 @@ export default function AdminNew() {
 
   // 데이터 로드 시 상태 업데이트
   useEffect(() => {
-    if (seoSettings?.data) {
+    if (seoSettings?.data && Array.isArray(seoSettings.data)) {
+      // 선택된 페이지의 SEO 설정 찾기
+      const currentPageSettings = seoSettings.data.find(setting => setting.pagePath === seoData.pagePath);
+      if (currentPageSettings) {
+        setSeoData({
+          pagePath: currentPageSettings.pagePath || seoData.pagePath,
+          pageTitle: currentPageSettings.pageTitle || "",
+          metaDescription: currentPageSettings.metaDescription || "",
+          ogTitle: currentPageSettings.ogTitle || "",
+          ogDescription: currentPageSettings.ogDescription || "",
+          keywords: currentPageSettings.keywords || ""
+        });
+      }
+    } else if (seoSettings?.data && !Array.isArray(seoSettings.data)) {
+      // 단일 객체인 경우
       setSeoData({
-        pagePath: seoSettings.data.pagePath || "",
+        pagePath: seoSettings.data.pagePath || seoData.pagePath,
         pageTitle: seoSettings.data.pageTitle || "",
         metaDescription: seoSettings.data.metaDescription || "",
         ogTitle: seoSettings.data.ogTitle || "",
@@ -64,7 +78,7 @@ export default function AdminNew() {
         keywords: seoSettings.data.keywords || ""
       });
     }
-  }, [seoSettings]);
+  }, [seoSettings, seoData.pagePath]);
 
   useEffect(() => {
     if (aiSettings?.data) {
@@ -73,6 +87,31 @@ export default function AdminNew() {
       });
     }
   }, [aiSettings]);
+
+  // 초기 SEO 데이터 로드
+  useEffect(() => {
+    if (isAuthenticated && seoData.pagePath) {
+      const loadInitialSeoData = async () => {
+        try {
+          const response = await apiRequest("GET", `/api/admin/seo?pagePath=${seoData.pagePath}`);
+          const data = await response.json();
+          if (data.data) {
+            setSeoData(prev => ({
+              ...prev,
+              pageTitle: data.data.pageTitle || "",
+              metaDescription: data.data.metaDescription || "",
+              ogTitle: data.data.ogTitle || "",
+              ogDescription: data.data.ogDescription || "",
+              keywords: data.data.keywords || ""
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to load initial SEO settings:', error);
+        }
+      };
+      loadInitialSeoData();
+    }
+  }, [isAuthenticated]);
 
   // 뮤테이션
   const seoMutation = useMutation({
@@ -142,7 +181,6 @@ export default function AdminNew() {
 
   const handleSeoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('SEO Data being submitted:', seoData);
     seoMutation.mutate(seoData);
   };
 
@@ -320,7 +358,46 @@ export default function AdminNew() {
             <form onSubmit={handleSeoSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="pagePath">페이지 선택</Label>
-                <Select value={seoData.pagePath} onValueChange={(value) => setSeoData({...seoData, pagePath: value})}>
+                <Select value={seoData.pagePath} onValueChange={async (value) => {
+                  // 페이지 경로 업데이트
+                  setSeoData(prev => ({...prev, pagePath: value}));
+                  
+                  // 해당 페이지의 SEO 설정 로드
+                  try {
+                    const response = await apiRequest("GET", `/api/admin/seo?pagePath=${value}`);
+                    const data = await response.json();
+                    if (data.data) {
+                      setSeoData({
+                        pagePath: value,
+                        pageTitle: data.data.pageTitle || "",
+                        metaDescription: data.data.metaDescription || "",
+                        ogTitle: data.data.ogTitle || "",
+                        ogDescription: data.data.ogDescription || "",
+                        keywords: data.data.keywords || ""
+                      });
+                    } else {
+                      // 해당 페이지의 설정이 없으면 빈 값으로 초기화
+                      setSeoData({
+                        pagePath: value,
+                        pageTitle: "",
+                        metaDescription: "",
+                        ogTitle: "",
+                        ogDescription: "",
+                        keywords: ""
+                      });
+                    }
+                  } catch (error) {
+                    console.error('Failed to load SEO settings for page:', error);
+                    setSeoData({
+                      pagePath: value,
+                      pageTitle: "",
+                      metaDescription: "",
+                      ogTitle: "",
+                      ogDescription: "",
+                      keywords: ""
+                    });
+                  }
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="페이지를 선택하세요" />
                   </SelectTrigger>
