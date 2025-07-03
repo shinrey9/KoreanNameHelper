@@ -9,12 +9,15 @@ export default function Homepage() {
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center mb-4">
             <Globe className="h-12 w-12 text-blue-600 mr-3" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Language Tools
+              NameAtlas
             </h1>
           </div>
+          <p className="text-lg text-gray-500 dark:text-gray-400 font-medium mb-6">
+            Discover your name in every language
+          </p>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Powerful conversion tools for names, text, and more. Connect with global languages using AI-powered accuracy.
           </p>
