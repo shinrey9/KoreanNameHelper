@@ -7,6 +7,7 @@ import { textToSpeechService } from "./services/textToSpeech";
 import { aiTextToSpeechService } from "./services/aiTextToSpeech";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 // Helper function to group syllables into words
 function groupSyllablesIntoWords(breakdown: any[], originalName: string) {
@@ -46,6 +47,22 @@ function groupSyllablesIntoWords(breakdown: any[], originalName: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
   // API Routes
 
   // Convert name to Korean
@@ -133,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get SEO settings for a specific page
-  app.get("/api/admin/seo", async (req, res) => {
+  app.get("/api/admin/seo", isAuthenticated, async (req, res) => {
     try {
       const pagePath = req.query.pagePath as string;
       if (!pagePath) {
@@ -157,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update SEO settings
-  app.put("/api/admin/seo", async (req, res) => {
+  app.put("/api/admin/seo", isAuthenticated, async (req, res) => {
     try {
       const validatedData = seoSettingsUpdateSchema.parse(req.body);
       const updatedSettings = await storage.updateSeoSettings(validatedData);
@@ -173,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get AI settings
-  app.get("/api/admin/ai", async (req, res) => {
+  app.get("/api/admin/ai", isAuthenticated, async (req, res) => {
     try {
       const aiSettings = await storage.getAiSettings();
       const safeSettings = aiSettings ? {
@@ -192,7 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update AI settings
-  app.put("/api/admin/ai", async (req, res) => {
+  app.put("/api/admin/ai", isAuthenticated, async (req, res) => {
     try {
       const validatedData = aiSettingsUpdateSchema.parse(req.body);
       const updatedSettings = await storage.updateAiSettings(validatedData);
@@ -211,7 +228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin page route
-  app.get("/admin", (req, res) => {
+  app.get("/admin", isAuthenticated, (req, res) => {
     res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>

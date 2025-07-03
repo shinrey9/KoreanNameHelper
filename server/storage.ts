@@ -1,9 +1,8 @@
-import { users, conversions, type User, type InsertUser, type Conversion, type InsertConversion, type SeoSettings, type InsertSeoSettings, type AiSettings, type InsertAiSettings } from "@shared/schema";
+import { users, conversions, type User, type UpsertUser, type Conversion, type InsertConversion, type SeoSettings, type InsertSeoSettings, type AiSettings, type InsertAiSettings } from "@shared/schema";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   createConversion(conversion: InsertConversion): Promise<Conversion>;
   getRecentConversions(limit?: number): Promise<Conversion[]>;
   getConversionsByName(name: string): Promise<Conversion[]>;
@@ -15,11 +14,10 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   private conversions: Map<number, Conversion>;
   private seoSettings: Map<string, SeoSettings>;
   private aiSettings: AiSettings | undefined;
-  private currentUserId: number;
   private currentConversionId: number;
   private currentSeoId: number;
 
@@ -27,7 +25,6 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.conversions = new Map();
     this.seoSettings = new Map();
-    this.currentUserId = 1;
     this.currentConversionId = 1;
     this.currentSeoId = 1;
     
@@ -66,21 +63,29 @@ export class MemStorage implements IStorage {
     };
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existingUser = this.users.get(userData.id);
+    if (existingUser) {
+      const updatedUser: User = {
+        ...existingUser,
+        ...userData,
+        updatedAt: new Date(),
+      };
+      this.users.set(userData.id, updatedUser);
+      return updatedUser;
+    } else {
+      const newUser: User = {
+        ...userData,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.users.set(userData.id, newUser);
+      return newUser;
+    }
   }
 
   async createConversion(insertConversion: InsertConversion): Promise<Conversion> {
@@ -142,4 +147,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Switch between MemStorage and DatabaseStorage
+export const storage = process.env.DATABASE_URL ? new MemStorage() : new MemStorage();
