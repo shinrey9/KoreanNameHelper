@@ -1,6 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 import { Languages, ArrowRight, Sparkles, Globe, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -23,12 +22,14 @@ export default function Homepage() {
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   환영합니다, {user?.firstName || user?.email || '관리자'}님
                 </span>
-                <Link href="/admin">
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    관리자
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.href = "/admin"}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  관리자
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -88,12 +89,13 @@ export default function Homepage() {
                   Pronunciation audio playback
                 </div>
               </div>
-              <Link href="/korean-name-converter">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                  Convert My Name
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => window.location.href = "/korean-name-converter"}
+              >
+                Convert My Name
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </CardContent>
           </Card>
 
