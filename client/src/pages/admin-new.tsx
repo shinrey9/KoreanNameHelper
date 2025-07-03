@@ -77,10 +77,7 @@ export default function AdminNew() {
   // 뮤테이션
   const seoMutation = useMutation({
     mutationFn: async (data: typeof seoData) => {
-      return apiRequest("/api/admin/seo", {
-        method: "PUT",
-        body: JSON.stringify(data)
-      });
+      return apiRequest("PUT", "/api/admin/seo", data);
     },
     onSuccess: () => {
       toast({
@@ -101,10 +98,7 @@ export default function AdminNew() {
 
   const aiMutation = useMutation({
     mutationFn: async (data: typeof aiData) => {
-      return apiRequest("/api/admin/ai", {
-        method: "PUT",
-        body: JSON.stringify(data)
-      });
+      return apiRequest("PUT", "/api/admin/ai", data);
     },
     onSuccess: () => {
       toast({
