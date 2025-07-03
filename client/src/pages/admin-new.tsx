@@ -15,6 +15,35 @@ export default function AdminNew() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading, user } = useAuth();
   const queryClient = useQueryClient();
+
+  // 인증되지 않은 사용자 리디렉션
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "인증 필요",
+        description: "관리자 페이지에 접근하려면 로그인이 필요합니다.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  // 로딩 중이거나 인증되지 않은 경우
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {isLoading ? '인증 상태 확인 중...' : '로그인 페이지로 이동 중...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
   
   // 상태 관리
   const [seoData, setSeoData] = useState({

@@ -25,7 +25,7 @@ export default function Homepage() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => window.location.href = "/myadmin"}
+                  onClick={() => window.location.href = "/admin"}
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   관리자
