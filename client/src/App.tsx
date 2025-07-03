@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Homepage from "@/pages/homepage";
 import KoreanNameConverter from "@/pages/korean-name-converter";
-import Admin from "@/pages/admin";
 import AdminNew from "@/pages/admin-new";
 import NotFound from "@/pages/not-found";
 
@@ -14,8 +13,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Homepage} />
       <Route path="/korean-name-converter" component={KoreanNameConverter} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/myadmin" component={AdminNew} />
+      <Route path="/admin" component={AdminNew} />
       <Route component={NotFound} />
     </Switch>
   );
