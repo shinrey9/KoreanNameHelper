@@ -30,7 +30,7 @@ export function LanguageConverter({ onConvert, isLoading }: LanguageConverterPro
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      sourceLanguage: "en",
+      sourceLanguage: "auto",
     },
   });
 
