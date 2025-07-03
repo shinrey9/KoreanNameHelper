@@ -163,7 +163,7 @@ export default function Admin() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              관리자 패널
+              관리자 패널 (카드 기반)
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
               환영합니다, {user?.firstName || user?.email || '관리자'}님
