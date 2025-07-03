@@ -58,7 +58,7 @@ export const seoSettings = pgTable("seo_settings", {
 export const aiSettings = pgTable("ai_settings", {
   id: serial("id").primaryKey(),
   openaiModel: text("openai_model").notNull().default("gpt-4o"),
-  openaiApiKey: text("openai_api_key").notNull(),
+  openaiApiKey: text("openai_api_key"), // 선택사항으로 변경
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -99,7 +99,7 @@ export const insertAiSettingsSchema = createInsertSchema(aiSettings).omit({
 
 export const aiSettingsUpdateSchema = z.object({
   openaiModel: z.string().min(1, "OpenAI model is required"),
-  openaiApiKey: z.string().min(1, "OpenAI API key is required").min(10, "API key too short"),
+  openaiApiKey: z.string().optional(), // API 키는 선택사항
 });
 
 export type UpsertUser = typeof users.$inferInsert;
