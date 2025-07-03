@@ -95,9 +95,8 @@ export default function Homepage() {
 
         {/* Features Section */}
         <div className="mt-20 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-            Why Choose Our Language Tools?
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">NameAtlas
+</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="p-6">
               <Sparkles className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
