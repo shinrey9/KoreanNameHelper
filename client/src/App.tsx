@@ -15,7 +15,7 @@ function Router() {
       <Route path="/" component={Homepage} />
       <Route path="/korean-name-converter" component={KoreanNameConverter} />
       <Route path="/admin" component={Admin} />
-      <Route path="/admin-fresh" component={AdminNew} />
+      <Route path="/myadmin" component={AdminNew} />
       <Route component={NotFound} />
     </Switch>
   );
