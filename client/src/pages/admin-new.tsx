@@ -19,8 +19,8 @@ export default function AdminNew() {
   // 상태 관리
   const [seoData, setSeoData] = useState({
     pagePath: "",
-    title: "",
-    description: "",
+    pageTitle: "",
+    metaDescription: "",
     ogTitle: "",
     ogDescription: "",
     keywords: ""
@@ -57,8 +57,8 @@ export default function AdminNew() {
     if (seoSettings?.data) {
       setSeoData({
         pagePath: seoSettings.data.pagePath || "",
-        title: seoSettings.data.title || "",
-        description: seoSettings.data.description || "",
+        pageTitle: seoSettings.data.pageTitle || "",
+        metaDescription: seoSettings.data.metaDescription || "",
         ogTitle: seoSettings.data.ogTitle || "",
         ogDescription: seoSettings.data.ogDescription || "",
         keywords: seoSettings.data.keywords || ""
@@ -191,13 +191,13 @@ export default function AdminNew() {
                 <div>
                   <Label className="text-sm font-medium">제목</Label>
                   <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                    {seoSettings?.data?.title || 'Korean Name Pronunciation Tool'}
+                    {seoSettings?.data?.pageTitle || 'Korean Name Pronunciation Tool'}
                   </p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium">설명</Label>
                   <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                    {seoSettings?.data?.description || 'Transform names to Korean...'}
+                    {seoSettings?.data?.metaDescription || 'Transform names to Korean...'}
                   </p>
                 </div>
                 <Button 
@@ -332,20 +332,20 @@ export default function AdminNew() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="title">페이지 제목</Label>
+                <Label htmlFor="pageTitle">페이지 제목</Label>
                 <Input
-                  id="title"
-                  value={seoData.title}
-                  onChange={(e) => setSeoData({...seoData, title: e.target.value})}
+                  id="pageTitle"
+                  value={seoData.pageTitle}
+                  onChange={(e) => setSeoData({...seoData, pageTitle: e.target.value})}
                   placeholder="Korean Name Pronunciation Tool"
                 />
               </div>
               <div>
-                <Label htmlFor="description">메타 설명</Label>
+                <Label htmlFor="metaDescription">메타 설명</Label>
                 <Textarea
-                  id="description"
-                  value={seoData.description}
-                  onChange={(e) => setSeoData({...seoData, description: e.target.value})}
+                  id="metaDescription"
+                  value={seoData.metaDescription}
+                  onChange={(e) => setSeoData({...seoData, metaDescription: e.target.value})}
                   placeholder="Transform names to Korean Hangul with accurate pronunciation guides..."
                 />
               </div>
