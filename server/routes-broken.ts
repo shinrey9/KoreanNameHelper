@@ -413,10 +413,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (result.success) {
           messageEl.innerHTML = '<div class="success">SEO settings updated successfully!</div>';
         } else {
-          messageEl.innerHTML = '<div class="error">Error: ' + (result.error || 'Unknown error') + '</div>';
+          messageEl.innerHTML = '<div class="error">Error: </div>';
+          messageEl.lastElementChild.textContent += (result.error || 'Unknown error');
         }
       } catch (error) {
-        messageEl.innerHTML = '<div class="error">Error updating settings: ' + error.message + '</div>';
+        messageEl.innerHTML = '<div class="error">Error updating settings: </div>';
+        messageEl.lastElementChild.textContent += error.message;
       }
     });
 
@@ -439,10 +441,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Clear the API key field after successful update
           document.getElementById('openaiApiKey').value = '';
         } else {
-          messageEl.innerHTML = '<div class="error">Error: ' + (result.error || 'Unknown error') + '</div>';
+          messageEl.innerHTML = '<div class="error">Error: </div>';
+          messageEl.lastElementChild.textContent += (result.error || 'Unknown error');
         }
       } catch (error) {
-        messageEl.innerHTML = '<div class="error">Error updating settings: ' + error.message + '</div>';
+        messageEl.innerHTML = '<div class="error">Error updating settings: </div>';
+        messageEl.lastElementChild.textContent += error.message;
       }
     });
 
