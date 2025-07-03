@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -90,7 +90,6 @@ export default function Admin() {
         description: "SEO 설정이 업데이트되었습니다.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/seo"] });
-      setShowSeoModal(false);
     },
     onError: () => {
       toast({
@@ -115,7 +114,6 @@ export default function Admin() {
         description: "AI 설정이 업데이트되었습니다.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/ai"] });
-      setShowAiModal(false);
     },
     onError: () => {
       toast({
@@ -165,7 +163,7 @@ export default function Admin() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              관리자 패널 (카드 레이아웃)
+              관리자 패널 (카드 기반)
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
               환영합니다, {user?.firstName || user?.email || '관리자'}님
@@ -179,12 +177,10 @@ export default function Admin() {
           </Button>
         </div>
 
-        {/* 카드 기반 레이아웃 */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* SEO 설정 카드 */}
-          <Card className="border-2 border-blue-200 dark:border-blue-700">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-blue-700 dark:text-blue-300">SEO 설정</CardTitle>
+              <CardTitle>SEO 설정</CardTitle>
               <CardDescription>
                 웹사이트의 검색 엔진 최적화 설정을 관리합니다
               </CardDescription>
@@ -202,7 +198,7 @@ export default function Admin() {
                   </div>
                 </div>
                 <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700" 
+                  className="w-full" 
                   onClick={() => setShowSeoModal(true)}
                 >
                   SEO 설정 관리
@@ -211,10 +207,9 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* AI 설정 카드 */}
-          <Card className="border-2 border-green-200 dark:border-green-700">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-green-700 dark:text-green-300">AI 설정</CardTitle>
+              <CardTitle>AI 설정</CardTitle>
               <CardDescription>
                 OpenAI API 키와 모델 설정을 관리합니다
               </CardDescription>
@@ -226,7 +221,7 @@ export default function Admin() {
                   <p className="font-medium">{aiSettings?.data?.openaiModel || "설정되지 않음"}</p>
                 </div>
                 <Button 
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full"
                   onClick={() => setShowAiModal(true)}
                 >
                   AI 설정 관리
@@ -235,10 +230,9 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* 변환 기록 카드 */}
-          <Card className="border-2 border-purple-200 dark:border-purple-700">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-purple-700 dark:text-purple-300">변환 기록</CardTitle>
+              <CardTitle>변환 기록</CardTitle>
               <CardDescription>
                 최근 이름 변환 기록을 확인합니다
               </CardDescription>
@@ -249,7 +243,7 @@ export default function Admin() {
                   총 {conversions?.length || 0}개의 변환 기록
                 </div>
                 <Button 
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  className="w-full"
                   onClick={() => setShowConversionsModal(true)}
                 >
                   변환 기록 보기
@@ -258,10 +252,9 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          {/* 시스템 상태 카드 */}
-          <Card className="border-2 border-orange-200 dark:border-orange-700">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-orange-700 dark:text-orange-300">시스템 상태</CardTitle>
+              <CardTitle>시스템 상태</CardTitle>
               <CardDescription>
                 시스템 상태와 성능을 모니터링합니다
               </CardDescription>
@@ -272,7 +265,7 @@ export default function Admin() {
                   <span className="text-green-600">✓</span> 모든 시스템 정상 작동
                 </div>
                 <Button 
-                  className="w-full bg-orange-600 hover:bg-orange-700"
+                  className="w-full"
                   onClick={() => setShowSystemModal(true)}
                 >
                   시스템 상태 확인
