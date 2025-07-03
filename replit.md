@@ -114,6 +114,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 3, 2025**: Implemented language-specific pronunciation rules for accurate cross-language conversion
+- **July 3, 2025**: Fixed character breakdown to display complete words instead of individual syllables
 - **July 1, 2025**: Created multi-page architecture with separate homepage and tool pages
 - **July 1, 2025**: Added per-page SEO configuration system supporting individual page metadata
 - **July 1, 2025**: Added GPT-4.1, GPT-4.1 Mini, and GPT-4.1 Nano model options to admin panel

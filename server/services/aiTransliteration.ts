@@ -77,14 +77,29 @@ class AITransliterationService {
 
     const sourceLangName = languageNames[sourceLanguage] || sourceLanguage;
 
-    let basePrompt = `Convert the ${sourceLangName} name "${name}" to Korean Hangul with accurate pronunciation.
+    let basePrompt = `Convert the ${sourceLangName} name "${name}" to Korean Hangul with PRECISE ${sourceLangName} pronunciation.
+
+⚠️ CRITICAL WARNING: The letter J sounds completely different in different languages:
+- English J = "ㅈ" sound (jazz) → 조, 제, 지  
+- German J = "ㅇ" sound (yes) → 요, 예, 이
+- Spanish J = "ㅎ" sound (harsh H) → 호, 헤, 히
+
+MANDATORY: Use the actual pronunciation rules of ${sourceLangName}, NOT generic transliteration.
+
+Language-specific pronunciation rules:
+${this.getLanguageSpecificRules(sourceLanguage)}
 
 Instructions:
-1. Consider the phonetics and pronunciation of the original name in ${sourceLangName}
+1. Apply ${sourceLangName} phonetic rules exactly - same letters sound different in different languages
 2. Use proper Korean syllable structure (consonant-vowel-consonant pattern)
 3. Follow Korean transliteration conventions for foreign names
 4. For family names, use common Korean surname equivalents when appropriate
-5. Ensure the Korean version sounds natural when pronounced by Korean speakers`;
+5. Ensure the Korean version reflects how a native ${sourceLangName} speaker would pronounce it
+
+VERIFICATION: For "Johann" specifically:
+- If English: MUST be 조한 (JO-hahn)
+- If German: MUST be 요한 (YO-hahn)
+- If Spanish: MUST be 호한 (HO-hahn)`;
 
     // Add special instructions for Chinese characters
     if (sourceLanguage === 'zh' || sourceLanguage === 'zh-cn' || sourceLanguage === 'zh-tw') {
@@ -131,6 +146,64 @@ Examples for WORD-BY-WORD breakdown (NOT syllable-by-syllable):
 - "María José García" → breakdown: [{"hangul": "마리아", "romanization": "ma-ri-a", "type": "given"}, {"hangul": "호세", "romanization": "ho-se", "type": "middle"}, {"hangul": "가르시아", "romanization": "ga-reu-si-a", "type": "family"}]
 
 REMEMBER: Each breakdown entry must be a COMPLETE WORD from the original name, not individual syllables.`;
+  }
+
+  private getLanguageSpecificRules(sourceLanguage: string): string {
+    const rules: Record<string, string> = {
+      'en': `ENGLISH pronunciation rules:
+- J = ALWAYS 'ㅈ' sound (like "jazz") → 조, 제, 지
+- W = 'ㅜ' sound (like "water") → 워, 웨, 위  
+- R = soft 'ㄹ' sound → 르, 리, 러
+- TH = 'ㅅ' or 'ㄷ' sound → 스, 드
+- CRITICAL: Johann in English = 조한 (JO-hahn) NOT 요한
+- Examples: Johann → 조한, William → 윌리엄, Robert → 로버트, John → 존`,
+
+      'de': `GERMAN pronunciation rules:
+- J = ALWAYS 'ㅇ' sound (like English Y) → 요, 예, 이
+- W = 'ㅂ' sound (like V) → 브, 바, 비
+- R = rolled 'ㄹ' sound → 르, 리, 러  
+- CH = 'ㅎ' sound → 히, 하, 헤
+- CRITICAL: Johann in German = 요한 (YO-hahn) NOT 조한
+- Examples: Johann → 요한, Wolfgang → 볼프강, Heinrich → 하인리히`,
+
+      'fr': `FRENCH pronunciation rules:
+- J = soft 'ㅈ' sound → 즈, 지, 자
+- R = uvular 'ㄹ' sound → 르, 리, 러
+- Silent letters at end (final consonants often silent)
+- Nasal sounds: an/en → 앙, on → 옹
+- Examples: Jean → 장, Pierre → 피에르, François → 프랑수아`,
+
+      'es': `SPANISH pronunciation rules:
+- J = 'ㅎ' sound (like strong H) → 호, 헤, 히
+- LL = 'ㅇ' sound → 요, 예, 이
+- RR = strong rolled 'ㄹ' → 르, 리, 러
+- ñ = 'ㄴ' sound → 니, 나, 네
+- Examples: José → 호세, Guillermo → 기예르모, María → 마리아`,
+
+      'it': `ITALIAN pronunciation rules:
+- GI/GE = 'ㅈ' sound → 지, 제
+- CI/CE = 'ㅊ' sound → 치, 체  
+- GLI = 'ㅇ' sound → 리, 레
+- R = rolled 'ㄹ' → 르, 리, 러
+- Examples: Giuseppe → 주세페, Francesco → 프란체스코, Maria → 마리아`,
+
+      'pt': `PORTUGUESE pronunciation rules:
+- J = soft 'ㅈ' sound → 주, 지, 자
+- LH = 'ㅇ' sound → 리, 레
+- NH = 'ㄴ' sound → 니, 나
+- R at start = strong 'ㅎ' sound → 히, 하, 헤
+- Examples: João → 주앙, Carlos → 카를루스, Maria → 마리아`,
+
+      'ru': `RUSSIAN pronunciation rules:
+- Use Cyrillic pronunciation, not Latin transliteration
+- Я = 'ㅇ' sound → 야
+- Ю = 'ㅇ' sound → 유
+- Е = 'ㅇ' sound → 예
+- Soft/hard consonants distinction important
+- Examples: Иван → 이반, Владимир → 블라디미르, Екатерина → 예카테리나`
+    };
+
+    return rules[sourceLanguage] || `Apply standard ${sourceLanguage} pronunciation rules accurately.`;
   }
 
   async detectLanguage(text: string): Promise<string> {
