@@ -27,7 +27,8 @@ export default function AdminNew() {
   });
   
   const [aiData, setAiData] = useState({
-    openaiModel: "gpt-4o"
+    openaiModel: "gpt-4o",
+    openaiApiKey: ""
   });
   
   // 모달 상태
@@ -83,7 +84,8 @@ export default function AdminNew() {
   useEffect(() => {
     if (aiSettings?.data) {
       setAiData({
-        openaiModel: aiSettings.data.openaiModel || "gpt-4o"
+        openaiModel: aiSettings.data.openaiModel || "gpt-4o",
+        openaiApiKey: "" // API 키는 보안상 초기화
       });
     }
   }, [aiSettings]);
@@ -274,7 +276,7 @@ export default function AdminNew() {
                 <div>
                   <Label className="text-sm font-medium">API 키 상태</Label>
                   <p className="text-sm text-green-600 dark:text-green-400">
-                    ✅ Deployment Secrets에서 관리됨
+                    ✅ 설정됨 (수정 가능)
                   </p>
                 </div>
                 <Button 
@@ -482,11 +484,6 @@ export default function AdminNew() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAiSubmit} className="space-y-4">
-              <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 rounded border border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  💡 API 키는 Deployment Secrets에서 자동으로 관리됩니다. 여기서는 사용할 AI 모델만 선택하세요.
-                </p>
-              </div>
               <div>
                 <Label htmlFor="openaiModel">OpenAI 모델</Label>
                 <Select value={aiData.openaiModel} onValueChange={(value) => setAiData({...aiData, openaiModel: value})}>
@@ -501,6 +498,19 @@ export default function AdminNew() {
                     <SelectItem value="gpt-4.1-nano">GPT-4.1 Nano</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label htmlFor="openaiApiKey">OpenAI API 키</Label>
+                <Input
+                  id="openaiApiKey"
+                  type="password"
+                  value={aiData.openaiApiKey || ""}
+                  onChange={(e) => setAiData({...aiData, openaiApiKey: e.target.value})}
+                  placeholder="sk-... (선택사항)"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  빈 칸으로 두면 환경 변수 OPENAI_API_KEY를 사용합니다
+                </p>
               </div>
               <div className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => setShowAiModal(false)}>
