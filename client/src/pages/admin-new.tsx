@@ -199,26 +199,28 @@ export default function AdminNew() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4 sm:gap-0">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              🎯 새로운 관리자 패널 (카드 스타일)
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+              🎯 관리자 패널
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-2">
               환영합니다, {user?.firstName || user?.email || '관리자'}님
             </p>
           </div>
           <Button 
             variant="outline"
+            size="sm"
             onClick={() => window.location.href = "/api/logout"}
+            className="self-start sm:self-auto"
           >
             로그아웃
           </Button>
         </div>
 
         {/* 카드 기반 레이아웃 */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* SEO 설정 카드 */}
           <Card className="border-2 border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950">
             <CardHeader>

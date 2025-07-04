@@ -10,59 +10,63 @@ export default function Homepage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation */}
       <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-between items-center">
+        <div className="container mx-auto px-2 sm:px-4 py-3">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
             <div className="flex items-center">
-              <Globe className="h-8 w-8 text-blue-600 mr-2" />
-              <span className="text-xl font-bold text-gray-900 dark:text-white">NameAtlas</span>
+              <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2" />
+              <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">NameAtlas</span>
             </div>
             {/* 로그인된 관리자에게만 관리 메뉴 표시 */}
             {isAuthenticated && (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600 dark:text-gray-300">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 truncate max-w-[200px] sm:max-w-none">
                   환영합니다, {user?.firstName || user?.email || '관리자'}님
                 </span>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.location.href = "/admin"}
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  관리자
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.location.href = "/api/logout"}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  로그아웃
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.location.href = "/admin"}
+                    className="text-xs sm:text-sm"
+                  >
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    관리자
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => window.location.href = "/api/logout"}
+                    className="text-xs sm:text-sm"
+                  >
+                    <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    로그아웃
+                  </Button>
+                </div>
               </div>
             )}
           </div>
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-16">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 sm:mb-16">
           <div className="flex items-center justify-center mb-4">
-            <Globe className="h-12 w-12 text-blue-600 mr-3" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <Globe className="h-8 w-8 sm:h-12 sm:w-12 text-blue-600 mr-2 sm:mr-3" />
+            <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               NameAtlas
             </h1>
           </div>
-          <p className="text-lg text-gray-500 dark:text-gray-400 font-medium mb-6">
+          <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 font-medium mb-4 sm:mb-6">
             Discover your name in every language
           </p>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-4 sm:px-0">
             Powerful conversion tools for names, text, and more. Connect with global languages using AI-powered accuracy.
           </p>
         </div>
 
         {/* Tools Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
           {/* Korean Name Converter */}
           <Card className="hover:shadow-lg transition-shadow border-2 hover:border-blue-200 dark:hover:border-blue-700">
             <CardHeader>

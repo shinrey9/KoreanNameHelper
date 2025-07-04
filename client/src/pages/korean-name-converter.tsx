@@ -90,24 +90,24 @@ export default function KoreanNameConverter() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Header */}
-        <div className="flex items-center mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-0">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="mr-4">
+            <Button variant="ghost" size="sm" className="sm:mr-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Tools
             </Button>
           </Link>
           <div className="flex items-center">
-            <Sparkles className="h-8 w-8 text-blue-600 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Korean Name Converter</h1>
+            <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 sm:mr-3" />
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">Korean Name Converter</h1>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto">
           {!conversionData ? (
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
               {/* Main Converter */}
               <div className="lg:col-span-2">
                 <Card>
