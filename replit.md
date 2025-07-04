@@ -123,6 +123,7 @@ Preferred communication style: Simple, everyday language.
 - **July 3, 2025**: Set up PostgreSQL database with user and session tables for production deployment
 - **July 3, 2025**: Created user-friendly authentication system - public visitors can access main site, admin features only visible when logged in
 - **July 3, 2025**: Project ready for deployment to tools.kollectionk.com subdomain via Cloudflare DNS
+- **July 3, 2025**: Implemented server-side domain redirect from replit.app to custom domain for primary domain behavior
 - **July 3, 2025**: Implemented language-specific pronunciation rules for accurate cross-language conversion
 - **July 3, 2025**: Fixed character breakdown to display complete words instead of individual syllables
 - **July 1, 2025**: Created multi-page architecture with separate homepage and tool pages
