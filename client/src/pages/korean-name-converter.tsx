@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { LanguageConverter } from "@/components/LanguageConverter";
 import { ConversionResults } from "@/components/ConversionResults";
@@ -21,8 +21,14 @@ interface ConversionData {
 export default function KoreanNameConverter() {
   const [conversionData, setConversionData] = useState<ConversionData | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
+  const [isInIframe, setIsInIframe] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Detect if page is loaded in iframe
+  useEffect(() => {
+    setIsInIframe(window.parent !== window);
+  }, []);
 
   // Fetch recent conversions
   const { data: recentConversions } = useQuery({
@@ -93,12 +99,14 @@ export default function KoreanNameConverter() {
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-0">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="sm:mr-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Tools
-            </Button>
-          </Link>
+          {!isInIframe && (
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="sm:mr-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Tools
+              </Button>
+            </Link>
+          )}
           <div className="flex items-center">
             <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 mr-2 sm:mr-3" />
             <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">Korean Name Converter</h1>
