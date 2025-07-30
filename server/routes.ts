@@ -48,6 +48,23 @@ function groupSyllablesIntoWords(breakdown: any[], originalName: string) {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // iframe 허용 헤더 설정
+  app.use((req, res, next) => {
+    const referer = req.get('referer');
+    
+    // 워드프레스 사이트에서만 iframe 허용 (kollectionk.com 도메인)
+    if (referer && referer.includes('kollectionk.com')) {
+      res.setHeader('X-Frame-Options', 'ALLOW-FROM https://kollectionk.com');
+      res.setHeader('Content-Security-Policy', "frame-ancestors https://kollectionk.com https://*.kollectionk.com;");
+    } else {
+      // 다른 도메인에서도 허용하려면 ALLOWALL 사용
+      res.setHeader('X-Frame-Options', 'ALLOWALL');
+      res.setHeader('Content-Security-Policy', "frame-ancestors *;");
+    }
+    
+    next();
+  });
+
   // Domain redirect middleware - redirect from replit.app to custom domain
   app.use((req, res, next) => {
     const host = req.get('host');
