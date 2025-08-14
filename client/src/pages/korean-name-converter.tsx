@@ -24,10 +24,69 @@ export default function KoreanNameConverter() {
   const [isInIframe, setIsInIframe] = useState(false);
   const { toast } = useToast();
 
-  // Detect if page is loaded in iframe
+  // Detect if page is loaded in iframe and send height updates
   useEffect(() => {
-    setIsInIframe(window.parent !== window);
+    const isInFrame = window.parent !== window;
+    setIsInIframe(isInFrame);
+    
+    if (isInFrame) {
+      // Function to send height to parent
+      const sendHeightToParent = () => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage(
+          { 
+            type: 'resize', 
+            height: height,
+            source: 'korean-name-converter'
+          }, 
+          '*'
+        );
+      };
+
+      // Send initial height
+      sendHeightToParent();
+
+      // Create ResizeObserver to monitor content changes
+      const resizeObserver = new ResizeObserver(() => {
+        setTimeout(sendHeightToParent, 100); // Small delay for layout completion
+      });
+
+      // Observe the document body for size changes
+      if (document.body) {
+        resizeObserver.observe(document.body);
+      }
+
+      // Also listen for window resize
+      const handleResize = () => setTimeout(sendHeightToParent, 100);
+      window.addEventListener('resize', handleResize);
+
+      // Cleanup
+      return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', handleResize);
+      };
+    }
   }, []);
+
+  // Send height update when conversion data changes
+  useEffect(() => {
+    if (isInIframe) {
+      const sendHeightToParent = () => {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage(
+          { 
+            type: 'resize', 
+            height: height,
+            source: 'korean-name-converter'
+          }, 
+          '*'
+        );
+      };
+      
+      // Delay to ensure DOM is updated
+      setTimeout(sendHeightToParent, 200);
+    }
+  }, [conversionData, isInIframe]);
 
 
 
