@@ -65,19 +65,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  // Domain redirect middleware - redirect from replit.app to custom domain
-  app.use((req, res, next) => {
-    const host = req.get('host');
-    const customDomain = 'tools.kollectionk.com';
-    
-    // If accessing via replit.app domain, redirect to custom domain
-    if (host && host.includes('.replit.app') && !host.includes(customDomain)) {
-      const redirectUrl = `https://${customDomain}${req.originalUrl}`;
-      return res.redirect(301, redirectUrl);
-    }
-    
-    next();
-  });
+  // Domain redirect removed - using replit.app domain only
 
   // Auth middleware
   await setupAuth(app);
