@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { LanguageConverter } from "@/components/LanguageConverter";
 import { ConversionResults } from "@/components/ConversionResults";
 import { apiRequest } from "@/lib/queryClient";
@@ -23,18 +23,13 @@ export default function KoreanNameConverter() {
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
   const [isInIframe, setIsInIframe] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   // Detect if page is loaded in iframe
   useEffect(() => {
     setIsInIframe(window.parent !== window);
   }, []);
 
-  // Fetch recent conversions
-  const { data: recentConversions } = useQuery({
-    queryKey: ["/api/recent-conversions"],
-    enabled: !conversionData,
-  });
+
 
   // Convert name mutation
   const convertMutation = useMutation({
@@ -45,7 +40,6 @@ export default function KoreanNameConverter() {
     },
     onSuccess: (data) => {
       setConversionData(data);
-      queryClient.invalidateQueries({ queryKey: ["/api/recent-conversions"] });
       toast({
         title: "Conversion Complete",
         description: `Your name "${data.originalName}" has been converted to Korean!`,
@@ -113,58 +107,21 @@ export default function KoreanNameConverter() {
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           {!conversionData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-              {/* Main Converter */}
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-center text-2xl text-gray-800 dark:text-gray-200">
-                      Convert Your Name to Korean
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <LanguageConverter 
-                      onConvert={handleConvert} 
-                      isLoading={convertMutation.isPending}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Recent Conversions Sidebar */}
-              <div className="lg:col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Recent Conversions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {recentConversions && Array.isArray(recentConversions) && recentConversions.length > 0 ? (
-                      <div className="space-y-3">
-                        {recentConversions.slice(0, 5).map((conversion: any) => (
-                          <div key={conversion.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                            <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                              {conversion.originalName}
-                            </div>
-                            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                              {conversion.koreanName}
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">
-                              {conversion.romanization}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        No recent conversions yet. Try converting your name!
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-center text-2xl text-gray-800 dark:text-gray-200">
+                  Convert Your Name to Korean
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <LanguageConverter 
+                  onConvert={handleConvert} 
+                  isLoading={convertMutation.isPending}
+                />
+              </CardContent>
+            </Card>
           ) : (
             <ConversionResults
               data={conversionData}
