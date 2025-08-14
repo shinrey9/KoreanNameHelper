@@ -6,16 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// iframe 보안 설정 - 필요시 주석 해제
-// app.use((req, res, next) => {
-//   // 특정 도메인만 iframe 허용
-//   res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // 같은 도메인만 허용
-//   // 또는
-//   // res.setHeader('X-Frame-Options', 'DENY'); // 모든 iframe 차단
-//   // 또는
-//   // res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://trusted-domain.com"); // 특정 도메인만 허용
-//   next();
-// });
+// iframe 보안 설정 - kollectionk.com만 허용
+app.use((req, res, next) => {
+  // kollectionk.com과 하위 도메인만 iframe 허용
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://kollectionk.com https://*.kollectionk.com");
+  next();
+});
 
 app.use((req, res, next) => {
   const start = Date.now();
