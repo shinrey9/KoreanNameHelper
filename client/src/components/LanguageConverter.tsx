@@ -146,11 +146,11 @@ export function LanguageConverter({ onConvert, isLoading }: LanguageConverterPro
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-center space-x-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors inline-flex items-center space-x-2 shadow-md hover:shadow-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors inline-flex items-center justify-center space-x-2 shadow-md hover:shadow-lg w-full sm:w-auto"
               >
                 <RotateCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                 <span>Convert to Korean</span>
@@ -160,7 +160,7 @@ export function LanguageConverter({ onConvert, isLoading }: LanguageConverterPro
                 type="button"
                 variant="outline"
                 onClick={resetForm}
-                className="px-6 py-3 font-medium"
+                className="px-6 py-3 font-medium w-full sm:w-auto"
               >
                 Reset
               </Button>
