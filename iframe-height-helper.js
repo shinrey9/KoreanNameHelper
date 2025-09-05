@@ -1,3 +1,4 @@
+
 /**
  * Korean Name Converter iframe 자동 높이 조절 및 로딩 스피너
  * 
@@ -18,24 +19,32 @@
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
+        .korean-iframe-container {
+          position: relative;
+          width: 100%;
+          min-height: 600px; /* 미리 공간 확보 */
+          border-radius: 8px;
+          overflow: hidden;
+          background: #f8f9fa;
+        }
         .korean-loading-overlay {
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(248, 249, 250, 0.95);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          z-index: 1000;
-          min-height: 400px;
+          z-index: 10;
+          min-height: 600px;
         }
         .korean-spinner {
           width: 40px;
           height: 40px;
-          border: 4px solid #f3f3f3;
+          border: 4px solid #e9ecef;
           border-top: 4px solid #3498db;
           border-radius: 50%;
           animation: korean-spinner-spin 1s linear infinite;
@@ -46,6 +55,13 @@
           font-size: 16px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
+        .korean-iframe-hidden {
+          opacity: 0;
+        }
+        .korean-iframe-visible {
+          opacity: 1;
+          transition: opacity 0.5s ease-in-out;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -54,59 +70,55 @@
     const iframes = document.querySelectorAll('iframe[data-korean-converter]');
 
     iframes.forEach(function(iframe) {
-      // iframe 컨테이너를 relative position으로 설정
-      const container = iframe.parentElement;
-      if (container) {
-        const containerStyle = getComputedStyle(container);
-        if (containerStyle.position === 'static') {
-          container.style.position = 'relative';
-        }
+      // iframe을 컨테이너로 감싸기
+      const container = document.createElement('div');
+      container.className = 'korean-iframe-container';
+      
+      // iframe을 컨테이너로 이동
+      iframe.parentNode.insertBefore(container, iframe);
+      container.appendChild(iframe);
 
-        // 로딩 오버레이 생성
-        const loadingOverlay = document.createElement('div');
-        loadingOverlay.className = 'korean-loading-overlay';
+      // 로딩 오버레이 생성
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'korean-loading-overlay';
 
-        const spinner = document.createElement('div');
-        spinner.className = 'korean-spinner';
+      const spinner = document.createElement('div');
+      spinner.className = 'korean-spinner';
 
-        const text = document.createElement('div');
-        text.className = 'korean-loading-text';
-        text.textContent = '한국어 이름 변환기 로딩 중...';
+      const text = document.createElement('div');
+      text.className = 'korean-loading-text';
+      text.textContent = '한국어 이름 변환기 로딩 중...';
 
-        loadingOverlay.appendChild(spinner);
-        loadingOverlay.appendChild(text);
+      loadingOverlay.appendChild(spinner);
+      loadingOverlay.appendChild(text);
+      container.appendChild(loadingOverlay);
 
-        // 로딩 오버레이를 컨테이너에 추가
-        container.appendChild(loadingOverlay);
+      // iframe 초기 설정
+      iframe.className = 'korean-iframe-hidden';
+      iframe.style.width = '100%';
+      iframe.style.height = '600px';
+      iframe.style.border = 'none';
 
-        // iframe 초기 설정
-        iframe.style.opacity = '0';
-        iframe.style.transition = 'opacity 0.5s ease-in-out';
-
-        // iframe 로드 완료 시 처리
-        iframe.addEventListener('load', function() {
-          // iframe이 완전히 로드되면 즉시 표시
-          iframe.style.opacity = '1';
-          
-          // 로딩 오버레이 제거 (페이드 아웃)
+      // iframe 로드 완료 시 처리
+      iframe.addEventListener('load', function() {
+        // iframe 표시
+        iframe.className = 'korean-iframe-visible';
+        
+        // 로딩 오버레이 제거 (페이드 아웃)
+        setTimeout(function() {
+          loadingOverlay.style.opacity = '0';
+          loadingOverlay.style.transition = 'opacity 0.3s ease-out';
           setTimeout(function() {
-            loadingOverlay.style.opacity = '0';
-            loadingOverlay.style.transition = 'opacity 0.3s ease-out';
-            setTimeout(function() {
-              if (loadingOverlay.parentNode) {
-                loadingOverlay.parentNode.removeChild(loadingOverlay);
-              }
-            }, 300);
-          }, 100); // 빠른 응답을 위해 100ms로 단축
-        });
-      }
+            if (loadingOverlay.parentNode) {
+              loadingOverlay.parentNode.removeChild(loadingOverlay);
+            }
+          }, 300);
+        }, 100);
+      });
     });
 
     // postMessage 이벤트 리스너 추가
     window.addEventListener('message', function(event) {
-      // 보안을 위해 origin 체크 (개발 환경에서는 주석 처리 가능)
-      // if (event.origin !== 'https://korean-name-helper-chkshin.replit.app') return;
-      
       // Korean Name Converter에서 온 메시지만 처리
       if (event.data && event.data.source === 'korean-name-converter') {
 
@@ -119,8 +131,13 @@
               const minHeight = 400;
               const newHeight = Math.max(event.data.height, minHeight);
               iframe.style.height = newHeight + 'px';
+              
+              // 컨테이너 높이도 조절
+              const container = iframe.closest('.korean-iframe-container');
+              if (container) {
+                container.style.minHeight = newHeight + 'px';
+              }
 
-              // 디버그 로그 (필요시 제거 가능)
               console.log('iframe 높이 조절:', newHeight + 'px');
             }
           });
@@ -132,30 +149,6 @@
         }
       }
     });
-
-    // 추가 높이 자동 조절 로직 (기존 페이지 코드와 통합)
-    function setupAdditionalAutoResize() {
-      window.addEventListener('message', function(event) {
-        if (event.data && 
-            event.data.type === 'resize' && 
-            event.data.source === 'korean-name-converter' &&
-            typeof event.data.height === 'number') {
-          
-          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
-          
-          iframes.forEach(function(iframe) {
-            if (iframe.contentWindow === event.source) {
-              const minHeight = 400;
-              const newHeight = Math.max(event.data.height, minHeight);
-              iframe.style.height = newHeight + 'px';
-            }
-          });
-        }
-      });
-    }
-
-    // 추가 로직도 실행
-    setupAdditionalAutoResize();
   }
 
   // DOM이 로드되면 실행
@@ -173,5 +166,9 @@ function setKoreanConverterHeight(height) {
   const iframes = document.querySelectorAll('iframe[data-korean-converter]');
   iframes.forEach(function(iframe) {
     iframe.style.height = height + 'px';
+    const container = iframe.closest('.korean-iframe-container');
+    if (container) {
+      container.style.minHeight = height + 'px';
+    }
   });
 }
