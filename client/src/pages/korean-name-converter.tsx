@@ -6,7 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
 interface ConversionData {
@@ -159,8 +159,19 @@ export default function KoreanNameConverter() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
+      {/* Loading Overlay */}
+      {convertMutation.isPending && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Converting your name...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">This might take a few seconds</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8"></div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-0">
           {!isInIframe && (
