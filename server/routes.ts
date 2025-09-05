@@ -67,8 +67,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Domain redirect removed - using replit.app domain only
 
+  // Test database connection if using PostgreSQL
+  if (process.env.DATABASE_URL) {
+    console.log("Testing database connection...");
+    try {
+      const { testDatabaseConnection } = await import("./db");
+      const dbConnected = await testDatabaseConnection();
+      if (!dbConnected) {
+        console.warn("⚠️  Database connection test failed, but continuing with startup");
+      }
+    } catch (error) {
+      console.error("❌ Database connection error during startup:", error instanceof Error ? error.message : 'Unknown error');
+      console.log("Continuing with startup, but database operations may fail");
+    }
+  }
+
   // Auth middleware
+  console.log("Setting up authentication...");
   await setupAuth(app);
+  console.log("✓ Authentication setup complete");
+
+  // Health check endpoint for deployment verification
+  app.get('/health', async (req, res) => {
+    try {
+      // Check database connection by attempting a simple query
+      if (process.env.DATABASE_URL) {
+        await storage.getAiSettings();
+      }
+      
+      res.status(200).json({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+      });
+    } catch (error) {
+      console.error("Health check failed:", error);
+      res.status(503).json({ 
+        status: 'unhealthy', 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
