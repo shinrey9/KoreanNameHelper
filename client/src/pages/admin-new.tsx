@@ -25,12 +25,12 @@ export default function AdminNew() {
     ogDescription: "",
     keywords: ""
   });
-  
+
   const [aiData, setAiData] = useState({
     openaiModel: "gpt-4o",
     openaiApiKey: ""
   });
-  
+
   // 모달 상태
   const [showSeoModal, setShowSeoModal] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
@@ -291,38 +291,6 @@ export default function AdminNew() {
             </CardContent>
           </Card>
 
-          {/* 변환 기록 카드 */}
-          <Card className="border-2 border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-950">
-            <CardHeader>
-              <CardTitle className="text-purple-700 dark:text-purple-300">📊 변환 기록</CardTitle>
-              <CardDescription>
-                최근 이름 변환 기록을 확인합니다
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-sm font-medium">총 변환 횟수</Label>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {conversions?.length || 0}건
-                  </p>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">최근 활동</Label>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {conversions?.length > 0 ? '활성' : '없음'}
-                  </p>
-                </div>
-                <Button 
-                  onClick={() => setShowConversionsModal(true)}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
-                >
-                  변환 기록 보기
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* 시스템 상태 카드 */}
           <Card className="border-2 border-orange-200 dark:border-orange-700 bg-orange-50 dark:bg-orange-950">
             <CardHeader>
@@ -371,7 +339,7 @@ export default function AdminNew() {
                 <Select value={seoData.pagePath} onValueChange={async (value) => {
                   // 페이지 경로 업데이트
                   setSeoData(prev => ({...prev, pagePath: value}));
-                  
+
                   // 해당 페이지의 SEO 설정 로드
                   try {
                     const response = await apiRequest("GET", `/api/admin/seo?pagePath=${value}`);
