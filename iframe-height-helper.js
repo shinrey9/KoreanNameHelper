@@ -1,4 +1,3 @@
-
 /**
  * Korean Name Converter iframe 자동 높이 조절 및 로딩 스피너
  * 
@@ -8,136 +7,115 @@
  */
 
 (function() {
-  let loadingSpinner;
-  
-  // 로딩 스피너 생성 함수
-  function createLoadingSpinner(targetElement) {
-    // 기존 스피너가 있으면 제거
-    if (loadingSpinner) {
-      loadingSpinner.remove();
-    }
-    
-    // 스피너 컨테이너 생성
-    loadingSpinner = document.createElement('div');
-    loadingSpinner.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      min-height: 400px;
-    `;
-    
-    // 스피너 애니메이션
-    const spinner = document.createElement('div');
-    spinner.style.cssText = `
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-bottom: 16px;
-    `;
-    
-    // 로딩 텍스트
-    const text = document.createElement('div');
-    text.style.cssText = `
-      color: #666;
-      font-size: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    `;
-    text.textContent = '한국어 이름 변환기 로딩 중...';
-    
-    loadingSpinner.appendChild(spinner);
-    loadingSpinner.appendChild(text);
-    
-    // CSS 애니메이션 추가
-    if (!document.querySelector('#spinner-keyframes')) {
+  // iframe 높이 자동 조절 및 로딩 스피너 설정
+  function setupIframeAutoResize() {
+    // CSS 애니메이션 추가 (한 번만)
+    if (!document.querySelector('#korean-converter-styles')) {
       const style = document.createElement('style');
-      style.id = 'spinner-keyframes';
+      style.id = 'korean-converter-styles';
       style.textContent = `
-        @keyframes spin {
+        @keyframes korean-spinner-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        .korean-loading-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.95);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          min-height: 400px;
+        }
+        .korean-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f3f3;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          animation: korean-spinner-spin 1s linear infinite;
+          margin-bottom: 16px;
+        }
+        .korean-loading-text {
+          color: #666;
+          font-size: 16px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
       `;
       document.head.appendChild(style);
     }
-    
-    return loadingSpinner;
-  }
-  
-  // iframe 높이 자동 조절 함수
-  function setupIframeAutoResize() {
-    // 모든 Korean Name Converter iframe에 로딩 스피너 추가
+
+    // 모든 Korean Name Converter iframe 처리
     const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+
     iframes.forEach(function(iframe) {
       // iframe 컨테이너를 relative position으로 설정
       const container = iframe.parentElement;
-      if (container && getComputedStyle(container).position === 'static') {
-        container.style.position = 'relative';
-      }
-      
-      // 로딩 스피너 생성 및 추가
-      const spinner = createLoadingSpinner();
       if (container) {
-        container.appendChild(spinner);
-      } else {
-        iframe.parentNode.insertBefore(spinner, iframe.nextSibling);
-      }
-      
-      // iframe 초기 스타일 설정
-      iframe.style.opacity = '0';
-      iframe.style.transition = 'opacity 0.3s ease-in-out';
-    });
-    
-    // postMessage 이벤트 리스너 추가
-    window.addEventListener('message', function(event) {
-      // 보안을 위해 origin 체크 (필요시 특정 도메인으로 제한)
-      // if (event.origin !== 'https://tools.kollectionk.com') return;
-      
-      // Korean Name Converter에서 온 메시지 처리
-      if (event.data && event.data.source === 'korean-name-converter') {
-        
-        // 로딩 완료 신호 처리
-        if (event.data.type === 'loaded') {
-          // 로딩 스피너 숨기기
-          if (loadingSpinner) {
-            loadingSpinner.style.opacity = '0';
+        const containerStyle = getComputedStyle(container);
+        if (containerStyle.position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        // 로딩 오버레이 생성
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'korean-loading-overlay';
+
+        const spinner = document.createElement('div');
+        spinner.className = 'korean-spinner';
+
+        const text = document.createElement('div');
+        text.className = 'korean-loading-text';
+        text.textContent = '한국어 이름 변환기 로딩 중...';
+
+        loadingOverlay.appendChild(spinner);
+        loadingOverlay.appendChild(text);
+
+        // 로딩 오버레이를 컨테이너에 추가
+        container.appendChild(loadingOverlay);
+
+        // iframe 초기 설정
+        iframe.style.opacity = '0';
+        iframe.style.transition = 'opacity 0.5s ease-in-out';
+
+        // iframe 로드 완료 시 처리
+        iframe.addEventListener('load', function() {
+          // 로딩 오버레이 제거 (페이드 아웃)
+          setTimeout(function() {
+            loadingOverlay.style.opacity = '0';
             setTimeout(function() {
-              if (loadingSpinner) {
-                loadingSpinner.remove();
-                loadingSpinner = null;
+              if (loadingOverlay.parentNode) {
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
               }
             }, 300);
-          }
-          
+          }, 500); // 0.5초 후 페이드 아웃 시작
+
           // iframe 표시
-          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
-          iframes.forEach(function(iframe) {
-            if (iframe.contentWindow === event.source) {
-              iframe.style.opacity = '1';
-            }
-          });
-        }
-        
+          iframe.style.opacity = '1';
+        });
+      }
+    });
+
+    // postMessage 이벤트 리스너 추가
+    window.addEventListener('message', function(event) {
+      // Korean Name Converter에서 온 메시지만 처리
+      if (event.data && event.data.source === 'korean-name-converter') {
+
         // 높이 조절 신호 처리
         if (event.data.type === 'resize' && typeof event.data.height === 'number') {
           const iframes = document.querySelectorAll('iframe[data-korean-converter]');
-          
+
           iframes.forEach(function(iframe) {
             if (iframe.contentWindow === event.source) {
               const minHeight = 400;
               const newHeight = Math.max(event.data.height, minHeight);
               iframe.style.height = newHeight + 'px';
-              
+
               // 디버그 로그 (필요시 제거 가능)
               console.log('iframe 높이 조절:', newHeight + 'px');
             }
