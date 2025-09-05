@@ -171,7 +171,7 @@ export default function KoreanNameConverter() {
         </div>
       )}
       
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8"></div>
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 sm:mb-8 gap-3 sm:gap-0">
           {!isInIframe && (
