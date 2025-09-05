@@ -19,8 +19,16 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// iframe 보안 설정 - kollectionk.com만 허용
+// CORS 및 iframe 보안 설정
 app.use((req, res, next) => {
+  // 모든 도메인에서 iframe-height-helper.js 접근 허용
+  if (req.path === '/iframe-height-helper.js') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+  }
+  
   // kollectionk.com과 하위 도메인만 iframe 허용
   res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://kollectionk.com https://*.kollectionk.com");
   next();

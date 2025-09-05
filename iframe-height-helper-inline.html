@@ -1,0 +1,282 @@
+
+<!-- 워드프레스 HTML 편집기에 직접 붙여넣기용 -->
+<script>
+(function() {
+  // iframe 높이 자동 조절 및 로딩 스피너 설정
+  function setupIframeAutoResize() {
+    // CSS 애니메이션 추가 (한 번만)
+    if (!document.querySelector('#korean-converter-styles')) {
+      const style = document.createElement('style');
+      style.id = 'korean-converter-styles';
+      style.textContent = `
+        @keyframes korean-spinner-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .korean-iframe-container {
+          position: relative;
+          width: 100%;
+          min-height: 600px;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #f8f9fa;
+        }
+        .korean-loading-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgb(239 246 255) 0%, rgb(255 255 255) 50%, rgb(250 245 255) 100%);
+          z-index: 10;
+          min-height: 600px;
+          padding: 32px;
+          overflow: hidden;
+        }
+        .korean-loading-content {
+          max-width: 64rem;
+          margin: 0 auto;
+          height: 100%;
+          position: relative;
+        }
+        .korean-loading-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+        .korean-loading-title {
+          width: 250px;
+          height: 32px;
+          background: #e5e7eb;
+          border-radius: 8px;
+          margin-left: 12px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-form {
+          background: white;
+          border-radius: 12px;
+          padding: 32px;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e5e7eb;
+          margin-bottom: 24px;
+        }
+        .korean-loading-form-row {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 16px;
+          margin-bottom: 32px;
+        }
+        .korean-loading-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .korean-loading-label {
+          width: 100px;
+          height: 16px;
+          background: #e5e7eb;
+          border-radius: 4px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-input {
+          height: 48px;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 16px;
+        }
+        .korean-loading-button {
+          width: 160px;
+          height: 48px;
+          background: #3b82f6;
+          border-radius: 8px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-button.secondary {
+          background: #e5e7eb;
+        }
+        .korean-spinner-container {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 20;
+        }
+        .korean-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #e9ecef;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          animation: korean-spinner-spin 1s linear infinite;
+          margin-bottom: 16px;
+        }
+        .korean-loading-text {
+          color: #666;
+          font-size: 16px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          text-align: center;
+        }
+        @keyframes korean-skeleton-pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+        @media (max-width: 768px) {
+          .korean-loading-form-row {
+            grid-template-columns: 1fr;
+          }
+          .korean-loading-buttons {
+            flex-direction: column;
+          }
+          .korean-loading-button {
+            width: 100%;
+          }
+        }
+        .korean-iframe-hidden {
+          opacity: 0;
+        }
+        .korean-iframe-visible {
+          opacity: 1;
+          transition: opacity 0.5s ease-in-out;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // 모든 Korean Name Converter iframe 처리
+    const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+
+    iframes.forEach(function(iframe) {
+      // iframe을 컨테이너로 감싸기
+      const container = document.createElement('div');
+      container.className = 'korean-iframe-container';
+      
+      // iframe을 컨테이너로 이동
+      iframe.parentNode.insertBefore(container, iframe);
+      container.appendChild(iframe);
+
+      // 로딩 오버레이 생성
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'korean-loading-overlay';
+      
+      loadingOverlay.innerHTML = `
+        <div class="korean-loading-content">
+          <!-- 헤더 스켈레톤 -->
+          <div class="korean-loading-header">
+            <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 6px;"></div>
+            <div class="korean-loading-title"></div>
+          </div>
+          
+          <!-- 폼 스켈레톤 -->
+          <div class="korean-loading-form">
+            <div class="korean-loading-form-row">
+              <div class="korean-loading-field">
+                <div class="korean-loading-label"></div>
+                <div class="korean-loading-input"></div>
+              </div>
+              <div class="korean-loading-field">
+                <div class="korean-loading-label"></div>
+                <div class="korean-loading-input"></div>
+              </div>
+            </div>
+            <div class="korean-loading-buttons">
+              <div class="korean-loading-button"></div>
+              <div class="korean-loading-button secondary"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 스피너 -->
+        <div class="korean-spinner-container">
+          <div class="korean-spinner"></div>
+          <div class="korean-loading-text">한국어 이름 변환기 로딩 중...</div>
+        </div>
+      `;
+      
+      container.appendChild(loadingOverlay);
+
+      // iframe 초기 설정
+      iframe.className = 'korean-iframe-hidden';
+      iframe.style.width = '100%';
+      iframe.style.height = '600px';
+      iframe.style.border = 'none';
+
+      // iframe 로드 완료 시 처리
+      iframe.addEventListener('load', function() {
+        // iframe 표시
+        iframe.className = 'korean-iframe-visible';
+        
+        // 로딩 오버레이 제거 (페이드 아웃)
+        setTimeout(function() {
+          loadingOverlay.style.opacity = '0';
+          loadingOverlay.style.transition = 'opacity 0.3s ease-out';
+          setTimeout(function() {
+            if (loadingOverlay.parentNode) {
+              loadingOverlay.parentNode.removeChild(loadingOverlay);
+            }
+          }, 300);
+        }, 100);
+      });
+    });
+
+    // postMessage 이벤트 리스너 추가
+    window.addEventListener('message', function(event) {
+      // Korean Name Converter에서 온 메시지만 처리
+      if (event.data && event.data.source === 'korean-name-converter') {
+
+        // 높이 조절 신호 처리
+        if (event.data.type === 'resize' && typeof event.data.height === 'number') {
+          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+
+          iframes.forEach(function(iframe) {
+            if (iframe.contentWindow === event.source) {
+              const minHeight = 400;
+              const newHeight = Math.max(event.data.height, minHeight);
+              iframe.style.height = newHeight + 'px';
+              
+              // 컨테이너 높이도 조절
+              const container = iframe.closest('.korean-iframe-container');
+              if (container) {
+                container.style.minHeight = newHeight + 'px';
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  // DOM이 로드되면 실행
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupIframeAutoResize);
+  } else {
+    setupIframeAutoResize();
+  }
+})();
+</script>
+
+<!-- iframe은 아래처럼 사용하세요 -->
+<iframe 
+  src="https://korean-name-helper-chkshin.replit.app/korean-name-converter"
+  width="100%"
+  height="600"
+  style="border: none;"
+  data-korean-converter
+  title="Korean Name Converter">
+</iframe>
