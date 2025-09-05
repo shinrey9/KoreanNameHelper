@@ -104,8 +104,8 @@
 
     // postMessage 이벤트 리스너 추가
     window.addEventListener('message', function(event) {
-      // 보안을 위해 origin 체크
-      if (event.origin !== 'https://korean-name-helper-chkshin.replit.app') return;
+      // 보안을 위해 origin 체크 (개발 환경에서는 주석 처리 가능)
+      // if (event.origin !== 'https://korean-name-helper-chkshin.replit.app') return;
       
       // Korean Name Converter에서 온 메시지만 처리
       if (event.data && event.data.source === 'korean-name-converter') {
@@ -125,8 +125,37 @@
             }
           });
         }
+
+        // 로딩 완료 신호 처리
+        if (event.data.type === 'loaded') {
+          console.log('Korean Name Converter 로딩 완료');
+        }
       }
     });
+
+    // 추가 높이 자동 조절 로직 (기존 페이지 코드와 통합)
+    function setupAdditionalAutoResize() {
+      window.addEventListener('message', function(event) {
+        if (event.data && 
+            event.data.type === 'resize' && 
+            event.data.source === 'korean-name-converter' &&
+            typeof event.data.height === 'number') {
+          
+          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+          
+          iframes.forEach(function(iframe) {
+            if (iframe.contentWindow === event.source) {
+              const minHeight = 400;
+              const newHeight = Math.max(event.data.height, minHeight);
+              iframe.style.height = newHeight + 'px';
+            }
+          });
+        }
+      });
+    }
+
+    // 추가 로직도 실행
+    setupAdditionalAutoResize();
   }
 
   // DOM이 로드되면 실행
