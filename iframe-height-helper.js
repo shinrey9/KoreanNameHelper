@@ -1,8 +1,6 @@
+
 /**
- * Korean Name Converter - iframe Height Auto-Resize Helper
- * 
- * 이 스크립트를 iframe을 포함하는 부모 페이지에 추가하면
- * iframe의 높이가 자동으로 조절됩니다.
+ * Korean Name Converter iframe 자동 높이 조절 및 로딩 스피너
  * 
  * 사용법:
  * 1. 이 파일을 부모 페이지에 포함시키거나
@@ -12,12 +10,98 @@
 (function() {
   let loadingSpinner;
   
+  // 로딩 스피너 생성 함수
+  function createLoadingSpinner(targetElement) {
+    // 기존 스피너가 있으면 제거
+    if (loadingSpinner) {
+      loadingSpinner.remove();
+    }
+    
+    // 스피너 컨테이너 생성
+    loadingSpinner = document.createElement('div');
+    loadingSpinner.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      min-height: 400px;
+    `;
+    
+    // 스피너 애니메이션
+    const spinner = document.createElement('div');
+    spinner.style.cssText = `
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    `;
+    
+    // 로딩 텍스트
+    const text = document.createElement('div');
+    text.style.cssText = `
+      color: #666;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    `;
+    text.textContent = '한국어 이름 변환기 로딩 중...';
+    
+    loadingSpinner.appendChild(spinner);
+    loadingSpinner.appendChild(text);
+    
+    // CSS 애니메이션 추가
+    if (!document.querySelector('#spinner-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'spinner-keyframes';
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    return loadingSpinner;
+  }
+  
   // iframe 높이 자동 조절 함수
   function setupIframeAutoResize() {
+    // 모든 Korean Name Converter iframe에 로딩 스피너 추가
+    const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+    iframes.forEach(function(iframe) {
+      // iframe 컨테이너를 relative position으로 설정
+      const container = iframe.parentElement;
+      if (container && getComputedStyle(container).position === 'static') {
+        container.style.position = 'relative';
+      }
+      
+      // 로딩 스피너 생성 및 추가
+      const spinner = createLoadingSpinner();
+      if (container) {
+        container.appendChild(spinner);
+      } else {
+        iframe.parentNode.insertBefore(spinner, iframe.nextSibling);
+      }
+      
+      // iframe 초기 스타일 설정
+      iframe.style.opacity = '0';
+      iframe.style.transition = 'opacity 0.3s ease-in-out';
+    });
+    
     // postMessage 이벤트 리스너 추가
     window.addEventListener('message', function(event) {
       // 보안을 위해 origin 체크 (필요시 특정 도메인으로 제한)
-      // if (event.origin !== 'https://your-domain.com') return;
+      // if (event.origin !== 'https://tools.kollectionk.com') return;
       
       // Korean Name Converter에서 온 메시지 처리
       if (event.data && event.data.source === 'korean-name-converter') {
@@ -26,7 +110,13 @@
         if (event.data.type === 'loaded') {
           // 로딩 스피너 숨기기
           if (loadingSpinner) {
-            loadingSpinner.style.display = 'none';
+            loadingSpinner.style.opacity = '0';
+            setTimeout(function() {
+              if (loadingSpinner) {
+                loadingSpinner.remove();
+                loadingSpinner = null;
+              }
+            }, 300);
           }
           
           // iframe 표시
@@ -40,24 +130,19 @@
         
         // 높이 조절 신호 처리
         if (event.data.type === 'resize' && typeof event.data.height === 'number') {
-        
-        // iframe 찾기 (Korean Name Converter iframe을 식별)
-        const iframes = document.querySelectorAll('iframe');
-        
-        iframes.forEach(function(iframe) {
-          // iframe의 src가 Korean Name Converter인지 확인
-          if (iframe.contentWindow === event.source) {
-            // 최소 높이 설정 (너무 작아지지 않도록)
-            const minHeight = 400;
-            const newHeight = Math.max(event.data.height, minHeight);
-            
-            // iframe 높이 조절
-            iframe.style.height = newHeight + 'px';
-            
-            // 디버깅용 로그 (프로덕션에서는 제거 가능)
-            console.log('iframe 높이 조절:', newHeight + 'px');
-          }
-        });
+          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+          
+          iframes.forEach(function(iframe) {
+            if (iframe.contentWindow === event.source) {
+              const minHeight = 400;
+              const newHeight = Math.max(event.data.height, minHeight);
+              iframe.style.height = newHeight + 'px';
+              
+              // 디버그 로그 (필요시 제거 가능)
+              console.log('iframe 높이 조절:', newHeight + 'px');
+            }
+          });
+        }
       }
     });
   }
@@ -71,16 +156,11 @@
 })();
 
 /**
- * 수동으로 iframe 높이를 설정하는 함수
- * 필요시 사용할 수 있습니다.
+ * 수동으로 iframe 높이를 설정하는 함수 (필요시 사용)
  */
-function setKoreanConverterIframeHeight(height) {
-  const iframes = document.querySelectorAll('iframe');
+function setKoreanConverterHeight(height) {
+  const iframes = document.querySelectorAll('iframe[data-korean-converter]');
   iframes.forEach(function(iframe) {
-    // Korean Name Converter iframe인지 확인하는 방법을 추가하세요
-    // 예: data-korean-converter 속성이나 특정 클래스명 사용
-    if (iframe.hasAttribute('data-korean-converter')) {
-      iframe.style.height = height + 'px';
-    }
+    iframe.style.height = height + 'px';
   });
 }
