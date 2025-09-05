@@ -85,24 +85,28 @@
 
         // iframe 로드 완료 시 처리
         iframe.addEventListener('load', function() {
+          // iframe이 완전히 로드되면 즉시 표시
+          iframe.style.opacity = '1';
+          
           // 로딩 오버레이 제거 (페이드 아웃)
           setTimeout(function() {
             loadingOverlay.style.opacity = '0';
+            loadingOverlay.style.transition = 'opacity 0.3s ease-out';
             setTimeout(function() {
               if (loadingOverlay.parentNode) {
                 loadingOverlay.parentNode.removeChild(loadingOverlay);
               }
             }, 300);
-          }, 500); // 0.5초 후 페이드 아웃 시작
-
-          // iframe 표시
-          iframe.style.opacity = '1';
+          }, 100); // 빠른 응답을 위해 100ms로 단축
         });
       }
     });
 
     // postMessage 이벤트 리스너 추가
     window.addEventListener('message', function(event) {
+      // 보안을 위해 origin 체크
+      if (event.origin !== 'https://korean-name-helper-chkshin.replit.app') return;
+      
       // Korean Name Converter에서 온 메시지만 처리
       if (event.data && event.data.source === 'korean-name-converter') {
 
