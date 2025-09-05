@@ -33,13 +33,92 @@
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(248, 249, 250, 0.95);
+          background: linear-gradient(135deg, rgb(239 246 255) 0%, rgb(255 255 255) 50%, rgb(250 245 255) 100%);
+          z-index: 10;
+          min-height: 600px;
+          padding: 32px;
+          overflow: hidden;
+        }
+        .korean-loading-content {
+          max-width: 64rem;
+          margin: 0 auto;
+          height: 100%;
+          position: relative;
+        }
+        .korean-loading-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 32px;
+        }
+        .korean-loading-title {
+          width: 250px;
+          height: 32px;
+          background: #e5e7eb;
+          border-radius: 8px;
+          margin-left: 12px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-form {
+          background: white;
+          border-radius: 12px;
+          padding: 32px;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e5e7eb;
+          margin-bottom: 24px;
+        }
+        .korean-loading-form-row {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 16px;
+          margin-bottom: 32px;
+        }
+        .korean-loading-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .korean-loading-label {
+          width: 100px;
+          height: 16px;
+          background: #e5e7eb;
+          border-radius: 4px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-input {
+          height: 48px;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 16px;
+        }
+        .korean-loading-button {
+          width: 160px;
+          height: 48px;
+          background: #3b82f6;
+          border-radius: 8px;
+          animation: korean-skeleton-pulse 2s ease-in-out infinite;
+        }
+        .korean-loading-button.secondary {
+          background: #e5e7eb;
+        }
+        .korean-spinner-container {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          z-index: 10;
-          min-height: 600px;
+          background: rgba(255, 255, 255, 0.95);
+          padding: 24px;
+          border-radius: 12px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 20;
         }
         .korean-spinner {
           width: 40px;
@@ -54,6 +133,26 @@
           color: #666;
           font-size: 16px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          text-align: center;
+        }
+        @keyframes korean-skeleton-pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+        @media (max-width: 768px) {
+          .korean-loading-form-row {
+            grid-template-columns: 1fr;
+          }
+          .korean-loading-buttons {
+            flex-direction: column;
+          }
+          .korean-loading-button {
+            width: 100%;
+          }
         }
         .korean-iframe-hidden {
           opacity: 0;
@@ -81,16 +180,41 @@
       // 로딩 오버레이 생성
       const loadingOverlay = document.createElement('div');
       loadingOverlay.className = 'korean-loading-overlay';
-
-      const spinner = document.createElement('div');
-      spinner.className = 'korean-spinner';
-
-      const text = document.createElement('div');
-      text.className = 'korean-loading-text';
-      text.textContent = '한국어 이름 변환기 로딩 중...';
-
-      loadingOverlay.appendChild(spinner);
-      loadingOverlay.appendChild(text);
+      
+      loadingOverlay.innerHTML = `
+        <div class="korean-loading-content">
+          <!-- 헤더 스켈레톤 -->
+          <div class="korean-loading-header">
+            <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 6px;"></div>
+            <div class="korean-loading-title"></div>
+          </div>
+          
+          <!-- 폼 스켈레톤 -->
+          <div class="korean-loading-form">
+            <div class="korean-loading-form-row">
+              <div class="korean-loading-field">
+                <div class="korean-loading-label"></div>
+                <div class="korean-loading-input"></div>
+              </div>
+              <div class="korean-loading-field">
+                <div class="korean-loading-label"></div>
+                <div class="korean-loading-input"></div>
+              </div>
+            </div>
+            <div class="korean-loading-buttons">
+              <div class="korean-loading-button"></div>
+              <div class="korean-loading-button secondary"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 스피너 -->
+        <div class="korean-spinner-container">
+          <div class="korean-spinner"></div>
+          <div class="korean-loading-text">한국어 이름 변환기 로딩 중...</div>
+        </div>
+      `;
+      
       container.appendChild(loadingOverlay);
 
       // iframe 초기 설정
