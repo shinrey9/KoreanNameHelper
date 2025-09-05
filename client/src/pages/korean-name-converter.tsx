@@ -190,26 +190,30 @@ export default function KoreanNameConverter() {
 
         <div className="max-w-2xl mx-auto">
           {!conversionData ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-center text-2xl text-gray-800 dark:text-gray-200">
-                  Convert Your Name to Korean
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LanguageConverter 
-                  onConvert={handleConvert} 
-                  isLoading={convertMutation.isPending}
-                />
-              </CardContent>
-            </Card>
+            <div className={`transition-all duration-700 ease-in-out ${convertMutation.isPending ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}`}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl text-gray-800 dark:text-gray-200">
+                    Convert Your Name to Korean
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <LanguageConverter 
+                    onConvert={handleConvert} 
+                    isLoading={convertMutation.isPending}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           ) : (
-            <ConversionResults
-              data={conversionData}
-              audioUrl={audioUrl}
-              onTryAnother={handleTryAnother}
-              onPlayAudio={handlePlayAudio}
-            />
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
+              <ConversionResults
+                data={conversionData}
+                audioUrl={audioUrl}
+                onTryAnother={handleTryAnother}
+                onPlayAudio={handlePlayAudio}
+              />
+            </div>
           )}
         </div>
       </div>
