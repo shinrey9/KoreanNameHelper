@@ -10,6 +10,8 @@
  */
 
 (function() {
+  let loadingSpinner;
+  
   // iframe 높이 자동 조절 함수
   function setupIframeAutoResize() {
     // postMessage 이벤트 리스너 추가
@@ -17,11 +19,27 @@
       // 보안을 위해 origin 체크 (필요시 특정 도메인으로 제한)
       // if (event.origin !== 'https://your-domain.com') return;
       
-      // Korean Name Converter에서 온 메시지인지 확인
-      if (event.data && 
-          event.data.type === 'resize' && 
-          event.data.source === 'korean-name-converter' &&
-          typeof event.data.height === 'number') {
+      // Korean Name Converter에서 온 메시지 처리
+      if (event.data && event.data.source === 'korean-name-converter') {
+        
+        // 로딩 완료 신호 처리
+        if (event.data.type === 'loaded') {
+          // 로딩 스피너 숨기기
+          if (loadingSpinner) {
+            loadingSpinner.style.display = 'none';
+          }
+          
+          // iframe 표시
+          const iframes = document.querySelectorAll('iframe[data-korean-converter]');
+          iframes.forEach(function(iframe) {
+            if (iframe.contentWindow === event.source) {
+              iframe.style.opacity = '1';
+            }
+          });
+        }
+        
+        // 높이 조절 신호 처리
+        if (event.data.type === 'resize' && typeof event.data.height === 'number') {
         
         // iframe 찾기 (Korean Name Converter iframe을 식별)
         const iframes = document.querySelectorAll('iframe');

@@ -30,26 +30,37 @@ export default function KoreanNameConverter() {
     setIsInIframe(isInFrame);
     
     if (isInFrame) {
-      // Function to send height to parent
+      // iframe 로딩 완료 신호 전송
+      window.parent.postMessage(
+        { 
+          type: 'loaded', 
+          source: 'korean-name-converter'
+        }, 
+        '*'
+      );
+
+      // Function to send height to parent (debounced)
+      let heightTimeout: NodeJS.Timeout;
       const sendHeightToParent = () => {
-        const height = document.documentElement.scrollHeight;
-        window.parent.postMessage(
-          { 
-            type: 'resize', 
-            height: height,
-            source: 'korean-name-converter'
-          }, 
-          '*'
-        );
+        clearTimeout(heightTimeout);
+        heightTimeout = setTimeout(() => {
+          const height = document.documentElement.scrollHeight;
+          window.parent.postMessage(
+            { 
+              type: 'resize', 
+              height: height,
+              source: 'korean-name-converter'
+            }, 
+            '*'
+          );
+        }, 50); // 더 빠른 응답을 위해 50ms로 단축
       };
 
       // Send initial height
       sendHeightToParent();
 
       // Create ResizeObserver to monitor content changes
-      const resizeObserver = new ResizeObserver(() => {
-        setTimeout(sendHeightToParent, 100); // Small delay for layout completion
-      });
+      const resizeObserver = new ResizeObserver(sendHeightToParent);
 
       // Observe the document body for size changes
       if (document.body) {

@@ -7,13 +7,64 @@ Korean Name Converter를 iframe으로 다른 웹사이트에 포함시킬 때 �
 
 ```html
 <iframe 
-  src="https://tools.kollectionk.com/korean-name-converter"
+  src="https://your-replit-domain.replit.app/korean-name-converter"
   width="100%"
   height="600"
-  style="border: none; border-radius: 8px;"
+  style="border: none; border-radius: 8px; background: #f8f9fa;"
   data-korean-converter
-  title="Korean Name Converter">
+  title="Korean Name Converter"
+  loading="lazy">
 </iframe>
+```
+
+## 성능 최적화 옵션
+
+### 로딩 스피너 추가
+iframe 로딩 중 사용자 경험 개선:
+
+```html
+<div id="iframe-container" style="position: relative;">
+  <div id="loading-spinner" style="
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, sans-serif;
+    color: #666;
+  ">
+    <div style="
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    "></div>
+    로딩 중...
+  </div>
+  
+  <iframe 
+    src="https://your-replit-domain.replit.app/korean-name-converter"
+    width="100%"
+    height="600"
+    style="border: none; border-radius: 8px; opacity: 0; transition: opacity 0.3s;"
+    data-korean-converter
+    title="Korean Name Converter"
+    loading="lazy"
+    onload="document.getElementById('loading-spinner').style.display='none'; this.style.opacity='1';">
+  </iframe>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 ```
 
 ## 자동 높이 조절 설정
