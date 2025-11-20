@@ -8,8 +8,16 @@ import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
-if (!process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
+// Replit 인증을 사용할지 여부(필수 env가 모두 있는 경우에만 true)
+const hasReplitAuthConfig =
+  !!process.env.REPLIT_DOMAINS &&
+  !!process.env.SESSION_SECRET &&
+  !!process.env.DATABASE_URL;
+
+if (!hasReplitAuthConfig) {
+  console.warn(
+    "Replit auth env vars not fully provided; auth will be disabled in this environment."
+  );
 }
 
 const getOidcConfig = memoize(
@@ -67,6 +75,11 @@ async function upsertUser(
 }
 
 export async function setupAuth(app: Express) {
+  if (!hasReplitAuthConfig) {
+    console.log("Skipping Replit auth setup (no config in this environment).");
+    return; // Render 같은 환경에서는 인증 완전히 비활성화
+  }
+
   app.set("trust proxy", 1);
   app.use(getSession());
   app.use(passport.initialize());
